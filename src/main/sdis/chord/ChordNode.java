@@ -50,6 +50,13 @@ public interface ChordNode {
     void setFingerTableEntry(FingerTableEntry entry, int idx);
 
     /**
+     * Searches the node's finger table for the given address and returns the corresponding key
+     * @param address the address to search for
+     * @return the key that matches the given address
+     */
+    Key getKeyByAddress(InetSocketAddress address);
+
+    /**
      * Find the sucessor of a given key
      * @param key the key to lookup
      * @return the InetSocketAddres of the sucessor node of the given key
