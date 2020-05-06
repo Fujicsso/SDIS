@@ -13,7 +13,6 @@ public class PeerImpl extends ChordNodeImpl implements Peer {
     private String accessPoint;
     private ScheduledExecutorService executorService;
     private MessageReceiver receiver;
-    private MessageSender sender;
 
     /**
      * Construct a new Peer and join an empty Chord ring
@@ -44,7 +43,6 @@ public class PeerImpl extends ChordNodeImpl implements Peer {
         this.identifier = identifier;
         this.accessPoint = accessPoint;
         receiver = new MessageReceiver(this.address.getPort());
-        sender = new MessageSender();
         executorService = CustomExecutorService.getInstance();
     }
 

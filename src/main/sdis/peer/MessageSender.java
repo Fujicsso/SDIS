@@ -19,19 +19,24 @@ public class MessageSender {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public Message sendMessage(Message message, InetAddress destAddress, int destPort) throws IOException, ClassNotFoundException {
-        Socket socket = new Socket(destAddress, destPort);
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-
-        out.writeObject(message);
-
-        Message response = (Message) in.readObject();
-
-        socket.close();
-        out.close();
-        in.close();
-
-        return response;
+    public Message sendMessage(Message message, InetAddress destAddress, int destPort) {
+        try {
+            Socket socket = new Socket(destAddress, destPort);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+    
+            out.writeObject(message);
+    
+            Message response = (Message) in.readObject();
+    
+            socket.close();
+            out.close();
+            in.close();
+    
+            return response;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
