@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Represents a chord node
  */
-public class ChordNodeImpl {
+public class ChordNodeImpl implements ChordNode {
 
     protected InetSocketAddress address;
     protected InetSocketAddress contact;
@@ -41,10 +41,44 @@ public class ChordNodeImpl {
     }
 
     private void initFingerTable() {
-        this.fingerTable = new ArrayList<>(ChordSettings.M);
-        for (int i = 0; i < fingerTable.size(); i++) {
-            fingerTable.set(i, new FingerTableEntry());
+        this.fingerTable = new ArrayList<>();
+        for (int i = 0; i < ChordSettings.M; i++) {
+            fingerTable.add(new FingerTableEntry());
         }
+    }
+
+    @Override
+    public InetSocketAddress getSuccessor() {
+        return fingerTable.get(0).getAddress();
+    }
+
+    @Override
+    public InetSocketAddress getPredecessor() {
+        return predecessor;
+    }
+
+    @Override
+    public <T> T lookupObject(Key key) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public FingerTableEntry getFingerTableEntry(int idx) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setFingerTableEntry(FingerTableEntry entry) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public InetSocketAddress findSuccessor(Key key) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
