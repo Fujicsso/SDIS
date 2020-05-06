@@ -17,11 +17,11 @@ public interface ChordNode {
     InetSocketAddress getPredecessor();
 
     /**
-     * Finds the node which is responsible for a given key, e.g. a file
-     * @param key the key to lookup
-     * @return the key of the node which is responsible for the given key
+     * Finds the object with the given key, e.g. a file
+     * @param key the key of the object to find
+     * @return the object with the specified key
      */
-    NodeKey lookupKey(Key key);
+    <T> T lookupObject(Key key);
 
     /**
      * Returns the finger table entry on the given index
@@ -35,4 +35,11 @@ public interface ChordNode {
      * @param entry the entry by which the entry at index idx is to be replaced
      */
     void setFingerTableEntry(FingerTableEntry entry);
+
+    /**
+     * Find the sucessor of a given key
+     * @param key the key to lookup
+     * @return the InetSocketAddres of the sucessor node of the given key
+     */
+    InetSocketAddress findSuccessor(Key key);
 }
