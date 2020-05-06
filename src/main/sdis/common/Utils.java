@@ -8,9 +8,6 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -84,14 +81,25 @@ public class Utils {
     }
 
     /**
-     * Checks whether a given key belongs to an interval of keys
+     * Checks whether a given key belongs to a half closed interval of keys
      * @param key the key to check
      * @param lower the lower bound of the interval (exclusive)
      * @param upper the upper bound of the interval (inclusive)
      * @return true if the key belongs to the interval, false if otherwise
      */
-    public boolean isKeyInInterval(Key key, Key lower, Key upper) {
+    public static boolean isKeyInInterval(Key key, Key lower, Key upper) {
         return key.getValue() > lower.getValue() && key.getValue() <= upper.getValue();
+    }
+
+    /**
+     * Checks whether a given key belongs to an open interval of keys
+     * @param key the key to check
+     * @param lower the lower bound of the interval (exclusive)
+     * @param upper the upper bound of the interval (exclusive)
+     * @return true if the key belongs to the interval, false if otherwise
+     */
+    public static boolean isKeyInOpenInterval(Key key, Key lower, Key upper) {
+        return key.getValue() > lower.getValue() && key.getValue() < upper.getValue();
     }
 
     /**
