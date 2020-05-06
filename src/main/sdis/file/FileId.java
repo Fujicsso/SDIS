@@ -4,33 +4,31 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
+import java.util.Objects;
 
+import main.sdis.chord.ChordSettings;
 import main.sdis.chord.Key;
+import main.sdis.common.Utils;
 
 public class FileId implements Serializable, Key {
 
     private static final long serialVersionUID = -7980391741390295314L;
 
-    private byte[] hash;
+    private long value;
 
     protected FileId() {};
 
     public FileId(String fileName, long lastModified, String owner, byte[] fileData) {
         try {
-            this.hash = generateId(fileName, lastModified, owner, fileData);
+            byte[] hash = generateId(fileName, lastModified, owner, fileData);
+            value = Utils.truncateHash(hash, ChordSettings.M);
         } catch (NoSuchAlgorithmException e) {
-            this.hash = null;
+            this.value = 0;
         }
     }
 
     public FileId(byte[] hash) {
-        this.hash = hash;
-    }
-
-    public FileId(String base64Hash) {
-        this.hash = Base64.getUrlDecoder().decode(base64Hash);
+        value = Utils.truncateHash(hash, ChordSettings.M);
     }
 
     private byte[] generateId(String fileName, long lastModified, String owner, byte[] fileData) throws NoSuchAlgorithmException {
@@ -52,8 +50,9 @@ public class FileId implements Serializable, Key {
         return hash;
     }
 
-    public byte[] getHash() {
-        return hash;
+    @Override
+    public long getValue() {
+        return value;
     }
 
     @Override
@@ -63,16 +62,11 @@ public class FileId implements Serializable, Key {
 
         FileId other = (FileId) obj;
 
-        return Arrays.equals(hash, other.hash);
+        return value == other.getValue();
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(hash);
-    }
-
-    @Override
-    public String toString() {
-        return Base64.getUrlEncoder().encodeToString(hash);
+        return Objects.hashCode(value);
     }
 }

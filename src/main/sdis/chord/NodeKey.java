@@ -4,12 +4,14 @@ import java.net.InetSocketAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import main.sdis.common.Utils;
+
 /**
  * Represents a given chord node's key created from its InetSocketAddress
  */
-public class NodeKey implements Key{
+public class NodeKey implements Key {
 
-	private byte[] value;
+	private long value;
 
 	/**
 	 * Constructs a Key for a given InetSocketAddress by applying the
@@ -23,17 +25,18 @@ public class NodeKey implements Key{
 			digest = MessageDigest.getInstance(ChordSettings.HASH_FUNCTION);
 			String addressStr = address.getAddress().toString() + ":" + address.getPort();
 	
-			value = digest.digest(addressStr.getBytes());
+			byte[] hash = digest.digest(addressStr.getBytes());
+			value = Utils.truncateHash(hash, ChordSettings.M);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	/**
-	 * Returns the byte array representation of the Key
-	 * @return byte array representation of the Key
+	 * Returns the long representation of the Key
+	 * @return long representation of the Key
 	 */
-	public byte[] getValue() {
+	public long getValue() {
 		return value;
 	}
 }
