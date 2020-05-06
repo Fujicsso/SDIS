@@ -72,3 +72,6 @@ fabric.properties
 
 # Build Files
 build/
+
+# VSCode
+.vscode/
