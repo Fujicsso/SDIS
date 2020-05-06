@@ -1,6 +1,7 @@
 package main.sdis.message;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.util.StringJoiner;
 
 /**
@@ -11,37 +12,30 @@ public class MessageHeader implements Serializable {
 
     private static final long serialVersionUID = 5297031973080582522L;
 
-    protected String protocolVersion;
     protected MessageType messageType;
-    protected int senderId;
+    protected InetSocketAddress senderAddress;
 
     protected MessageHeader() {}
 
-    public MessageHeader(String protocolVersion, MessageType messageType, int senderId) {
-        this.protocolVersion = protocolVersion;
+    public MessageHeader(MessageType messageType, InetSocketAddress senderAddress) {
         this.messageType = messageType;
-        this.senderId = senderId;
-    }
-
-    public String getProtocolVersion() {
-        return protocolVersion;
+        this.senderAddress = senderAddress;
     }
 
     public MessageType getMessageType() {
         return messageType;
     }
 
-    public int getSenderId() {
-        return senderId;
+    public InetSocketAddress getSenderAddress() {
+        return senderAddress;
     }
 
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(" ");
 
-        sj.add(protocolVersion)
-            .add(messageType.toString())
-            .add(String.valueOf(senderId));
+        sj.add(messageType.toString())
+            .add(senderAddress.toString());
 
         return sj.toString();
     }
