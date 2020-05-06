@@ -32,4 +32,17 @@ public class FingerTableEntry {
     public InetSocketAddress getAddress() {
         return address;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof FingerTableEntry)) {
+            return false;
+        }
+
+        FingerTableEntry fingerTableEntry = (FingerTableEntry) o;
+        return key.equals(fingerTableEntry.key) && address.equals(fingerTableEntry.address);
+    }
 }

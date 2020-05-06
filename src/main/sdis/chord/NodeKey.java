@@ -39,4 +39,15 @@ public class NodeKey implements Key {
 	public long getValue() {
 		return value;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+		if (!(o instanceof NodeKey)) {
+			return false;
+		}
+		NodeKey nodeKey = (NodeKey) o;
+		return value == nodeKey.value;
+	}
 }
