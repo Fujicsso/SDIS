@@ -1,2 +1,2 @@
 #! /bin/sh
-javac -d build/ $(find src/main -name "*.java")
+javac -g -d build/ $(find src/main -name "*.java")
