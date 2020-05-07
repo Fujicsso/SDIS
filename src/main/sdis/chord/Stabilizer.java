@@ -38,7 +38,6 @@ public class Stabilizer implements Runnable {
 
             messageSender.sendMessage(message, succPredAddress.getAddress(), succPredAddress.getPort());
             // TODO: check for OK?
-            // TODO: create handler for IAMPRED message
         }
     }
     

@@ -112,8 +112,9 @@ public class Utils {
      * @return long value of the truncated hash
      */
     public static long truncateHash(byte[] hash, int m) {
-        final int BYTE_BITS= 8;
-        int necessarySize = (int) Math.ceil((double) m / BYTE_BITS);
+        int necessarySize = (int) Math.ceil((double) m / 8);
+
+        // Truncated key is the size of a long (8 bytes)
         byte[] truncatedKey = new byte[8];
         
         for (int i = 0; i < necessarySize; i++) {
@@ -124,8 +125,8 @@ public class Utils {
             truncatedKey[i] = 0;
         }
 
-        ByteBuffer buf = ByteBuffer.wrap(hash);
-        buf.order(ByteOrder.BIG_ENDIAN);
+        ByteBuffer buf = ByteBuffer.wrap(truncatedKey);
+        buf.order(ByteOrder.LITTLE_ENDIAN);
         buf.rewind();
 
         return buf.getLong();
