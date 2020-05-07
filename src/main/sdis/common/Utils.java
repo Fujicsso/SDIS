@@ -5,6 +5,7 @@ import main.sdis.file.FileId;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -113,13 +114,19 @@ public class Utils {
     public static long truncateHash(byte[] hash, int m) {
         final int BYTE_BITS= 8;
         int necessarySize = (int) Math.ceil((double) m / BYTE_BITS);
-        byte[] truncatedKey = new byte[necessarySize];
+        byte[] truncatedKey = new byte[8];
         
         for (int i = 0; i < necessarySize; i++) {
             truncatedKey[i] = hash[i];
         }
 
-        ByteBuffer buf = ByteBuffer.wrap(truncatedKey);
+        for (int i = necessarySize; i < truncatedKey.length; i++) {
+            truncatedKey[i] = 0;
+        }
+
+        ByteBuffer buf = ByteBuffer.wrap(hash);
+        buf.order(ByteOrder.BIG_ENDIAN);
+        buf.rewind();
 
         return buf.getLong();
     }
