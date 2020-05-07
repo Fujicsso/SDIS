@@ -11,7 +11,6 @@ public class PeerImpl extends ChordNodeImpl implements Peer {
 
     private int identifier;
     private String accessPoint;
-    private ScheduledExecutorService executorService;
     private MessageReceiver receiver;
 
     /**
@@ -43,7 +42,6 @@ public class PeerImpl extends ChordNodeImpl implements Peer {
         this.identifier = identifier;
         this.accessPoint = accessPoint;
         receiver = new MessageReceiver(this.address.getPort());
-        executorService = CustomExecutorService.getInstance();
     }
 
     @Override

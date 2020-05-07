@@ -3,10 +3,12 @@ package main.sdis.chord;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import main.sdis.common.CustomExecutorService;
 import main.sdis.common.Utils;
 import main.sdis.message.Message;
-import main.sdis.message.MessageHeader;
 import main.sdis.message.MessageType;
 import main.sdis.message.SingleArgumentHeader;
 import main.sdis.peer.MessageSender;
@@ -22,6 +24,7 @@ public class ChordNodeImpl implements ChordNode {
     protected List<FingerTableEntry> fingerTable;
     protected NodeKey nodeKey;
     protected MessageSender messageSender;
+    protected ScheduledExecutorService executorService;
 
     /**
      * Creates a new chord node and joins an empty ring
@@ -37,6 +40,9 @@ public class ChordNodeImpl implements ChordNode {
         predecessor = address;
 
         messageSender = new MessageSender();
+
+        executorService = CustomExecutorService.getInstance();
+        executorService.scheduleAtFixedRate(new Stabilizer(this), 0, 2, TimeUnit.SECONDS);
     }
 
     /**
@@ -92,6 +98,7 @@ public class ChordNodeImpl implements ChordNode {
         fingerTable.set(idx, entry);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public InetSocketAddress findSuccessor(Key key) {
         if (Utils.isKeyInInterval(key, this.nodeKey, getSuccessorKey()))
@@ -117,7 +124,7 @@ public class ChordNodeImpl implements ChordNode {
 
     @Override
     public InetSocketAddress getClosestPrecedingNode(Key key) {
-        for (int i = ChordSettings.M; i > 1; i--) {
+        for (int i = ChordSettings.M - 1; i > 0; i--) {
             if (Utils.isKeyInOpenInterval(getFingerTableEntry(i).getKey(), nodeKey, key))
                 return getFingerTableEntry(i).getAddress();
 
@@ -133,6 +140,26 @@ public class ChordNodeImpl implements ChordNode {
         }
 
         return null;
+    }
+
+    @Override
+    public void notify(InetSocketAddress nodeAddress) {
+        Key key = new NodeKey(nodeAddress);
+        Key predecessorKey = new NodeKey(predecessor);
+
+        if (predecessor == null || Utils.isKeyInOpenInterval(key, predecessorKey, nodeKey))
+            predecessor = nodeAddress;
+
+    }
+
+    @Override
+    public InetSocketAddress getAddress() {
+        return address;
+    }
+
+    @Override
+    public Key getKey() {
+        return nodeKey;
     }
 
 }

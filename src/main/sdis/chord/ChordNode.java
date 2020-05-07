@@ -3,6 +3,18 @@ package main.sdis.chord;
 import java.net.InetSocketAddress;
 
 public interface ChordNode {
+    
+    /**
+     * Returns the node's address
+     * @return the node's InetSocketAddress
+     */
+    InetSocketAddress getAddress();
+
+    /**
+     * Returns the node's key
+     * @return the node's key
+     */
+    Key getKey();
 
     /**
      * Returns the address of the node's sucessor by searching its local finger table
@@ -62,4 +74,10 @@ public interface ChordNode {
      * @return the InetSocketAddres of the sucessor node of the given key
      */
     InetSocketAddress findSuccessor(Key key);
+
+    /**
+     * Tell the node its new predecessor is the node with the address nodeAddress
+     * @param nodeAddress the address of the new predecessor
+     */
+    void notify(InetSocketAddress nodeAddress);
 }
