@@ -1,17 +1,14 @@
 package main.sdis.peer;
 
-import main.sdis.common.CustomExecutorService;
 import main.sdis.chord.ChordNodeImpl;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class PeerImpl extends ChordNodeImpl implements Peer {
 
     private int identifier;
     private String accessPoint;
-    private MessageReceiver receiver;
 
     /**
      * Construct a new Peer and join an empty Chord ring
@@ -41,7 +38,6 @@ public class PeerImpl extends ChordNodeImpl implements Peer {
     private void init(int identifier, String accessPoint) throws IOException {
         this.identifier = identifier;
         this.accessPoint = accessPoint;
-        receiver = new MessageReceiver(this.address.getPort());
     }
 
     @Override

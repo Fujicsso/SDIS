@@ -1,5 +1,6 @@
 package main.sdis.protocol;
 
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 
 import main.sdis.chord.ChordNode;
@@ -10,8 +11,8 @@ import main.sdis.message.SingleArgumentHeader;
 
 public class GetSuccHandler extends Handler implements Runnable {
 
-    public GetSuccHandler(ChordNode node, Message message) {
-        super(node, message);
+    public GetSuccHandler(ChordNode node, Message message, ObjectOutputStream out) {
+        super(node, message, out);
     }
 
     @Override
@@ -24,10 +25,7 @@ public class GetSuccHandler extends Handler implements Runnable {
 
         Message responseMessage = new Message(responseHeader);
 
-        messageSender.sendMessage(responseMessage, header.getSenderAddress().getAddress(),
-                header.getSenderAddress().getPort());
-        
-        // TODO: check for OK?
+        messageSender.reply(out, responseMessage);
     }
 
 }

@@ -19,6 +19,8 @@ public class IAmPredHandler extends Handler implements Runnable {
         InetSocketAddress newPredAddress = header.getArg();
 
         node.notify(newPredAddress);
+
+        // TODO: reply with OK?
     }
     
 }

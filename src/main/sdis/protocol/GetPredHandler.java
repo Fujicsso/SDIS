@@ -1,26 +1,26 @@
 package main.sdis.protocol;
 
+import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
+
 import main.sdis.chord.ChordNode;
 import main.sdis.message.Message;
-import main.sdis.message.MessageHeader;
 import main.sdis.message.MessageType;
+import main.sdis.message.SingleArgumentHeader;
 
 public class GetPredHandler extends Handler implements Runnable {
 
-    public GetPredHandler(ChordNode node, Message message) {
-        super(node, message);
+    public GetPredHandler(ChordNode node, Message message, ObjectOutputStream out) {
+        super(node, message, out);
     }
 
     @Override
     public void run() {
-        MessageHeader header = message.getHeader();
-
-        MessageHeader responseHeader = new MessageHeader(MessageType.PRED, node.getAddress());
+        SingleArgumentHeader<InetSocketAddress> responseHeader = new SingleArgumentHeader<InetSocketAddress>(
+                MessageType.PRED, node.getAddress(), node.getPredecessor());
         Message responseMessage = new Message(responseHeader);
 
-        messageSender.sendMessage(responseMessage, header.getSenderAddress().getAddress(), header.getSenderAddress().getPort());
-
-        // TODO: check for OK?
+        messageSender.reply(out, responseMessage);
     }
-    
+
 }
