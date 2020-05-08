@@ -1,5 +1,6 @@
 package main.sdis.chord;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import main.sdis.common.Utils;
 import main.sdis.message.Message;
 import main.sdis.message.MessageType;
 import main.sdis.message.SingleArgumentHeader;
+import main.sdis.peer.MessageReceiver;
 import main.sdis.peer.MessageSender;
 
 /**
@@ -24,6 +26,7 @@ public class ChordNodeImpl implements ChordNode {
     protected List<FingerTableEntry> fingerTable;
     protected NodeKey nodeKey;
     protected MessageSender messageSender;
+    protected MessageReceiver messageReceiver;
     protected ScheduledExecutorService executorService;
 
     /**
@@ -31,7 +34,7 @@ public class ChordNodeImpl implements ChordNode {
      * 
      * @param address The node's InetSocketAddress
      */
-    public ChordNodeImpl(InetSocketAddress address) {
+    public ChordNodeImpl(InetSocketAddress address) throws IOException {
         this.address = address;
         nodeKey = new NodeKey(address);
         initFingerTable();
@@ -43,6 +46,7 @@ public class ChordNodeImpl implements ChordNode {
 
         executorService = CustomExecutorService.getInstance();
         executorService.scheduleAtFixedRate(new Stabilizer(this), 0, 2, TimeUnit.SECONDS);
+        executorService.execute(new MessageReceiver(this, address.getPort()));
     }
 
     /**
@@ -51,13 +55,17 @@ public class ChordNodeImpl implements ChordNode {
      * @param address The node's InetSocketAddress
      * @param contact The contact (bootstrap) node's InetSocketAddress
      */
-    public ChordNodeImpl(InetSocketAddress address, InetSocketAddress contact) {
+    public ChordNodeImpl(InetSocketAddress address, InetSocketAddress contact) throws IOException {
         this.address = address;
         this.contact = contact;
         nodeKey = new NodeKey(address);
         initFingerTable();
 
         messageSender = new MessageSender();
+
+        executorService = CustomExecutorService.getInstance();
+        executorService.scheduleAtFixedRate(new Stabilizer(this), 0, 2, TimeUnit.SECONDS);
+        executorService.execute(new MessageReceiver(this, address.getPort()));
     }
 
     private void initFingerTable() {
@@ -89,12 +97,12 @@ public class ChordNodeImpl implements ChordNode {
     }
 
     @Override
-    public FingerTableEntry getFingerTableEntry(int idx) {
+    public synchronized FingerTableEntry getFingerTableEntry(int idx) {
         return fingerTable.get(idx);
     }
 
     @Override
-    public void setFingerTableEntry(FingerTableEntry entry, int idx) {
+    public synchronized void setFingerTableEntry(FingerTableEntry entry, int idx) {
         fingerTable.set(idx, entry);
     }
 
