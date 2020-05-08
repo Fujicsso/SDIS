@@ -4,6 +4,8 @@ import main.sdis.chord.Key;
 import main.sdis.file.FileId;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -130,5 +132,13 @@ public class Utils {
         buf.rewind();
 
         return buf.getLong();
+    }
+
+    public static String formatAddress(InetSocketAddress address) {
+        return address.toString() + ":" + address.getPort();
+    }
+
+    public static String formatAddress(InetAddress address, int port) {
+        return address.toString() + ":" + port;
     }
 }
