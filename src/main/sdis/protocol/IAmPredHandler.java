@@ -4,7 +4,6 @@ import java.net.InetSocketAddress;
 
 import main.sdis.chord.ChordNode;
 import main.sdis.message.Message;
-import main.sdis.message.SingleArgumentHeader;
 
 public class IAmPredHandler extends Handler implements Runnable {
 
@@ -14,9 +13,7 @@ public class IAmPredHandler extends Handler implements Runnable {
 
     @Override
     public void run() {
-        SingleArgumentHeader<InetSocketAddress> header = (SingleArgumentHeader<InetSocketAddress>) message.getHeader();
-
-        InetSocketAddress newPredAddress = header.getArg();
+        InetSocketAddress newPredAddress = message.getHeader().getSenderAddress();
 
         node.notify(newPredAddress);
 
