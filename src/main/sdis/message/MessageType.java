@@ -12,5 +12,8 @@ public enum MessageType {
     SUCC,       // Send the requested successor address (response to GETSUCC)
     GETPRED,    // Ask for the node's predecessor's address
     PRED,       // Send the node's predecessor's address (response to GETPRED)
-    IAMPRED     // Tells a node that this is its new predecessor
+    IAMPRED,    // Tells a node that this is its new predecessor
+    PING,       // Used to check if a given node is up
+    PONG,       // Reply to PING message
+    OK          // Generic reply message to messages that do not require a return value
 }
