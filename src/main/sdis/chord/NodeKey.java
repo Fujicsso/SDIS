@@ -31,6 +31,14 @@ public class NodeKey implements Key {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Constructs a Key with the given value
+	 * @param value the value
+	 */
+	public NodeKey(long value) {
+		this.value = value;
+	}
 	
 	/**
 	 * Returns the long representation of the Key
