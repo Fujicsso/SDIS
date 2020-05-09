@@ -1,5 +1,6 @@
 package main.sdis.common;
 
+import main.sdis.chord.FingerTableEntry;
 import main.sdis.chord.Key;
 import main.sdis.file.FileId;
 
@@ -11,6 +12,7 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -140,5 +142,20 @@ public class Utils {
 
     public static String formatAddress(InetAddress address, int port) {
         return address.toString() + ":" + port;
+    }
+
+    public synchronized static void printFingerTable(List<FingerTableEntry> fingerTable) {
+        final String FORMAT = "%-5d%-25s%-25s\n";
+
+        for (int i = 0; i < fingerTable.size(); i++) {
+            FingerTableEntry finger = fingerTable.get(i);
+
+            if (finger == null)
+                Utils.safePrintf(FORMAT, i, "NULL", "NULL");
+            else
+                Utils.safePrintf(FORMAT, i, finger.getAddress(), finger.getKey());
+        }
+
+        Utils.safePrintln("");
     }
 }
