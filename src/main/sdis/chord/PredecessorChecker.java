@@ -20,6 +20,10 @@ public class PredecessorChecker implements Runnable {
         MessageHeader header = new MessageHeader(MessageType.PING, node.getAddress());
         Message message = new Message(header);
 
+        // Avoid sending a PING message to itself
+        if (node.getAddress().equals(node.getPredecessor()))
+            return;
+
         Message responseMessage = messageSender.sendMessage(message, node.getPredecessor().getAddress(),
                 node.getPredecessor().getPort());
 
