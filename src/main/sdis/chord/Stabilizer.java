@@ -11,8 +11,8 @@ import main.sdis.peer.MessageSender;
 
 public class Stabilizer implements Runnable {
 
-    ChordNode node;
-    MessageSender messageSender;
+    private ChordNode node;
+    private MessageSender messageSender;
 
     public Stabilizer(ChordNode node) {
         this.node = node;
