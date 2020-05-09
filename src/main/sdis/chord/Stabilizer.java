@@ -27,18 +27,20 @@ public class Stabilizer implements Runnable {
         Message message = new Message(header);
 
         Message response = messageSender.sendMessage(message, succAddress.getAddress(), succAddress.getPort());
-        SingleArgumentHeader<InetSocketAddress> responseHeader = (SingleArgumentHeader<InetSocketAddress>) response.getHeader();
+        SingleArgumentHeader<InetSocketAddress> responseHeader = (SingleArgumentHeader<InetSocketAddress>) response
+                .getHeader();
 
         InetSocketAddress succPredAddress = responseHeader.getArg();
-        Key predKey = new NodeKey(succPredAddress);
+        Key succPredKey = new NodeKey(succPredAddress);
 
-        if (Utils.isKeyInOpenInterval(predKey, node.getKey(), node.getSuccessorKey())) {
-            header = new MessageHeader(MessageType.IAMPRED, node.getAddress());
-            message = new Message(header);
+        if (Utils.isKeyInOpenInterval(succPredKey, node.getKey(), node.getSuccessorKey()))
+            node.setSuccessor(succPredAddress);
 
-            messageSender.sendMessage(message, succPredAddress.getAddress(), succPredAddress.getPort());
-            // TODO: check for OK?
-        }
+        header = new MessageHeader(MessageType.IAMPRED, node.getAddress());
+        message = new Message(header);
+
+        messageSender.sendMessage(message, succPredAddress.getAddress(), succPredAddress.getPort());
+        // TODO: check for OK?
     }
-    
+
 }
