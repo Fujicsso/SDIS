@@ -11,7 +11,10 @@ import main.sdis.common.Utils;
  */
 public class NodeKey implements Key {
 
+	private static final long serialVersionUID = -410298703323733959L;
 	private long value;
+
+	protected NodeKey() {};
 
 	/**
 	 * Constructs a Key for a given InetSocketAddress by applying the
@@ -57,5 +60,10 @@ public class NodeKey implements Key {
 		}
 		NodeKey nodeKey = (NodeKey) o;
 		return value == nodeKey.value;
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
 	}
 }
