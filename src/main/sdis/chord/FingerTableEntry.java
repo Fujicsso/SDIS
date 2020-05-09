@@ -7,7 +7,7 @@ import java.net.InetSocketAddress;
  */
 public class FingerTableEntry {
 
-    private NodeKey key;
+    private Key key;
     private InetSocketAddress address;
 
     /**
@@ -20,12 +20,12 @@ public class FingerTableEntry {
      * @param key the node's key
      * @param address the node's InetSocketAddress
      */
-    public FingerTableEntry(NodeKey key, InetSocketAddress address) {
+    public FingerTableEntry(Key key, InetSocketAddress address) {
         this.key = key;
         this.address = address;
     }
 
-    public NodeKey getKey() {
+    public Key getKey() {
         return key;
     }
 
