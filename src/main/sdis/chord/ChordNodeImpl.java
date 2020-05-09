@@ -28,13 +28,36 @@ public class ChordNodeImpl implements ChordNode {
     protected MessageSender messageSender;
     protected MessageReceiver messageReceiver;
     protected ScheduledExecutorService executorService;
+    protected int fingerToFix = 1;
 
     /**
      * Creates a new chord node and joins an empty ring
      * 
      * @param address The node's InetSocketAddress
+     * @throws IOException
      */
     public ChordNodeImpl(InetSocketAddress address) throws IOException {
+        init(address);
+    }
+
+    /**
+     * Creates a new chord node and joins an existing ring
+     * 
+     * @param address The node's InetSocketAddress
+     * @param contact The contact (bootstrap) node's InetSocketAddress
+     * @throws IOException
+     */
+    public ChordNodeImpl(InetSocketAddress address, InetSocketAddress contact) throws IOException {
+        init(address);
+        this.contact = contact;
+    }
+
+    /**
+     * Shared constructor code
+     * @param address The node's InetSocketAddress
+     * @throws IOException
+     */
+    private void init(InetSocketAddress address) throws IOException {
         this.address = address;
         nodeKey = new NodeKey(address);
         initFingerTable();
@@ -45,26 +68,11 @@ public class ChordNodeImpl implements ChordNode {
         messageSender = new MessageSender();
 
         executorService = CustomExecutorService.getInstance();
+
         executorService.scheduleAtFixedRate(new Stabilizer(this), 0, 2, TimeUnit.SECONDS);
-        executorService.execute(new MessageReceiver(this, address.getPort()));
-    }
+        executorService.scheduleAtFixedRate(new PredecessorChecker(this), 0, 2, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new FingerFixer(this), 0, 2, TimeUnit.SECONDS);
 
-    /**
-     * Creates a new chord node and joins an existing ring
-     * 
-     * @param address The node's InetSocketAddress
-     * @param contact The contact (bootstrap) node's InetSocketAddress
-     */
-    public ChordNodeImpl(InetSocketAddress address, InetSocketAddress contact) throws IOException {
-        this.address = address;
-        this.contact = contact;
-        nodeKey = new NodeKey(address);
-        initFingerTable();
-
-        messageSender = new MessageSender();
-
-        executorService = CustomExecutorService.getInstance();
-        executorService.scheduleAtFixedRate(new Stabilizer(this), 0, 2, TimeUnit.SECONDS);
         executorService.execute(new MessageReceiver(this, address.getPort()));
     }
 
@@ -170,4 +178,24 @@ public class ChordNodeImpl implements ChordNode {
         return nodeKey;
     }
 
+    @Override
+    public void setPredecessor(InetSocketAddress address) {
+        this.predecessor = address;
+    }
+
+    @Override
+    public int getFingerToFix() {
+        return fingerToFix;
+    }
+
+    @Override
+    public void incrementFingerToFix() {
+        fingerToFix++;
+
+    }
+
+    @Override
+    public void resetFingerToFix() {
+        fingerToFix = 1;
+    }
 }

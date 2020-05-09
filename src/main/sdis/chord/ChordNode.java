@@ -80,4 +80,26 @@ public interface ChordNode {
      * @param nodeAddress the address of the new predecessor
      */
     void notify(InetSocketAddress nodeAddress);
+
+    /**
+     * Sets the node's predecessor
+     * @param address the predecessor's InetSocketAddress
+     */
+    void setPredecessor(InetSocketAddress address);
+
+    /**
+     * Returns the next finger table index that should be fixed
+     * @return the next finger table index that should be fixed
+     */
+    int getFingerToFix();
+
+    /**
+     * Increments the finger table index that should be fixed next by 1
+     */
+    void incrementFingerToFix();
+
+    /**
+     * Resets the finger table index that should be fixed back to 1
+     */
+    void resetFingerToFix();
 }
