@@ -50,10 +50,12 @@ public class ChordNodeImpl implements ChordNode {
     public ChordNodeImpl(InetSocketAddress address, InetSocketAddress contact) throws IOException {
         init(address);
         this.contact = contact;
+        join();
     }
 
     /**
      * Shared constructor code
+     * 
      * @param address The node's InetSocketAddress
      * @throws IOException
      */
@@ -63,6 +65,7 @@ public class ChordNodeImpl implements ChordNode {
         initFingerTable();
 
         fingerTable.set(0, new FingerTableEntry(nodeKey, address));
+        Utils.printFingerTable(fingerTable);
         predecessor = address;
 
         messageSender = new MessageSender();
@@ -70,8 +73,8 @@ public class ChordNodeImpl implements ChordNode {
         executorService = CustomExecutorService.getInstance();
 
         executorService.scheduleAtFixedRate(new Stabilizer(this), 0, 2, TimeUnit.SECONDS);
-        executorService.scheduleAtFixedRate(new PredecessorChecker(this), 0, 2, TimeUnit.SECONDS);
         executorService.scheduleAtFixedRate(new FingerFixer(this), 0, 2, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new PredecessorChecker(this), 0, 2, TimeUnit.SECONDS);
 
         executorService.execute(new MessageReceiver(this, address.getPort()));
     }
@@ -79,8 +82,21 @@ public class ChordNodeImpl implements ChordNode {
     private void initFingerTable() {
         this.fingerTable = new ArrayList<>();
         for (int i = 0; i < ChordSettings.M; i++) {
-            fingerTable.add(new FingerTableEntry());
+            fingerTable.add(null);
         }
+    }
+
+    private void join() {
+        SingleArgumentHeader<Key> header = new SingleArgumentHeader<Key>(MessageType.GETSUCC, address, nodeKey);
+        Message message = new Message(header);
+
+        Message response = messageSender.sendMessage(message, contact.getAddress(), contact.getPort());
+        SingleArgumentHeader<InetSocketAddress> responseHeader = (SingleArgumentHeader<InetSocketAddress>) response
+                .getHeader();
+
+        InetSocketAddress successorAddress = responseHeader.getArg();
+        Key successorKey = new NodeKey(successorAddress);
+        setFingerTableEntry(new FingerTableEntry(successorKey, successorAddress), 0);
     }
 
     @Override
@@ -123,8 +139,12 @@ public class ChordNodeImpl implements ChordNode {
             InetSocketAddress closestPrecedingNode = getClosestPrecedingNode(key);
             Key closestPrecedingKey = getKeyByAddress(closestPrecedingNode);
 
+            // If the node is it's own predecessor, then the successor will also be itself
+            if (closestPrecedingKey.equals(nodeKey))
+                return address;
+
             SingleArgumentHeader<Key> header = new SingleArgumentHeader<Key>(MessageType.GETSUCC, address,
-                    closestPrecedingKey);
+                    key);
 
             Message message = new Message(header);
 
@@ -141,9 +161,10 @@ public class ChordNodeImpl implements ChordNode {
     @Override
     public InetSocketAddress getClosestPrecedingNode(Key key) {
         for (int i = ChordSettings.M - 1; i > 0; i--) {
-            if (Utils.isKeyInOpenInterval(getFingerTableEntry(i).getKey(), nodeKey, key))
-                return getFingerTableEntry(i).getAddress();
+            FingerTableEntry finger = getFingerTableEntry(i);
 
+            if (finger != null && Utils.isKeyInOpenInterval(finger.getKey(), nodeKey, key))
+                return finger.getAddress();
         }
         return address;
     }
@@ -159,43 +180,52 @@ public class ChordNodeImpl implements ChordNode {
     }
 
     @Override
-    public void notify(InetSocketAddress nodeAddress) {
+    public synchronized void notify(InetSocketAddress nodeAddress) {
         Key key = new NodeKey(nodeAddress);
         Key predecessorKey = new NodeKey(predecessor);
 
         if (predecessor == null || Utils.isKeyInOpenInterval(key, predecessorKey, nodeKey))
             predecessor = nodeAddress;
-
     }
 
     @Override
-    public InetSocketAddress getAddress() {
+    public synchronized InetSocketAddress getAddress() {
         return address;
     }
 
     @Override
-    public Key getKey() {
+    public synchronized Key getKey() {
         return nodeKey;
     }
 
     @Override
-    public void setPredecessor(InetSocketAddress address) {
+    public synchronized void setPredecessor(InetSocketAddress address) {
         this.predecessor = address;
     }
 
     @Override
-    public int getFingerToFix() {
+    public synchronized int getFingerToFix() {
         return fingerToFix;
     }
 
     @Override
-    public void incrementFingerToFix() {
+    public synchronized void incrementFingerToFix() {
         fingerToFix++;
-
     }
 
     @Override
-    public void resetFingerToFix() {
+    public synchronized void resetFingerToFix() {
         fingerToFix = 1;
+    }
+
+    @Override
+    public synchronized List<FingerTableEntry> getFingerTable() {
+        return fingerTable;
+    }
+
+    @Override
+    public void setSuccessor(InetSocketAddress address) {
+        FingerTableEntry successor = new FingerTableEntry(new NodeKey(address), address);
+        setFingerTableEntry(successor, 0);
     }
 }

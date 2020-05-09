@@ -1,6 +1,7 @@
 package main.sdis.chord;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 public interface ChordNode {
     
@@ -21,6 +22,12 @@ public interface ChordNode {
      * @return the address of the node's successor
      */
     InetSocketAddress getSuccessorAddress();
+    
+    /**
+     * Sets the successor of the node
+     * @param address the new successor's address 
+     */
+    void setSuccessor(InetSocketAddress address);
 
     /**
      * Returns the key of the node's successor by searching its local finger table
@@ -102,4 +109,10 @@ public interface ChordNode {
      * Resets the finger table index that should be fixed back to 1
      */
     void resetFingerToFix();
+
+    /**
+     * Returns the node's finger table
+     * @return the node's finger table
+     */
+    List<FingerTableEntry> getFingerTable();
 }
