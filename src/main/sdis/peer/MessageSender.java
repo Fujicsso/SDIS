@@ -29,11 +29,11 @@ public class MessageSender {
 
             out.writeObject(message);
 
-            System.out.println(message + " --> " + Utils.formatAddress(destAddress, destPort));
+            Utils.safePrintln(message + " --> " + Utils.formatAddress(destAddress, destPort));
 
             Message response = (Message) in.readObject();
 
-            System.out.println("Reply from " + Utils.formatAddress(message.getHeader().getSenderAddress()) + " --> " + response);
+            Utils.safePrintln("Reply from " + Utils.formatAddress(message.getHeader().getSenderAddress()) + " --> " + response);
 
             socket.close();
             out.close();
@@ -49,7 +49,7 @@ public class MessageSender {
     public void reply(ObjectOutputStream out, Message message) {
         try {
             out.writeObject(message);
-            System.out.println("Replied to " + message.getHeader().getMessageType() + " message -> " + message);
+            Utils.safePrintln("Replied --> " + message);
         } catch (IOException e) {
             e.printStackTrace();
         }

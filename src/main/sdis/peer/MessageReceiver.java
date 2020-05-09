@@ -7,6 +7,7 @@ import main.sdis.message.Message;
 import main.sdis.protocol.GetPredHandler;
 import main.sdis.protocol.GetSuccHandler;
 import main.sdis.protocol.IAmPredHandler;
+import main.sdis.protocol.PingHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -36,7 +37,7 @@ public class MessageReceiver implements Runnable {
                 ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
                 Message message = (Message) in.readObject();
 
-                System.out.println("MessageReceiver: received message from "
+                Utils.safePrintln("MessageReceiver: received message from "
                         + Utils.formatAddress(message.getHeader().getSenderAddress()) + " --> " + message);
 
                 switch (message.getHeader().getMessageType()) {
@@ -48,6 +49,9 @@ public class MessageReceiver implements Runnable {
                         break;
                     case IAMPRED:
                         executorService.execute(new IAmPredHandler(node, message));
+                        break;
+                    case PING:
+                        executorService.execute(new PingHandler(node, message, out));
                         break;
                 }
             } catch (IOException | ClassNotFoundException e) {
