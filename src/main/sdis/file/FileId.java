@@ -7,8 +7,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
 
-import main.sdis.common.Utils;
-
 public class FileId implements Serializable {
 
     private static final long serialVersionUID = -7980391741390295314L;

@@ -2,12 +2,8 @@ package main.sdis.peer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
 
 import main.sdis.common.ConnectionFailedException;
-import main.sdis.common.CustomExecutorService;
-import main.sdis.common.MessageSender;
-import main.sdis.common.Node;
 import main.sdis.common.NodeImpl;
 import main.sdis.message.Message;
 import main.sdis.message.MessageHeader;

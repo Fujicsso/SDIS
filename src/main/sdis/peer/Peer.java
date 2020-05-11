@@ -1,7 +1,6 @@
 package main.sdis.peer;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 

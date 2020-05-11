@@ -1,9 +1,7 @@
 package main.sdis.server;
 
 import java.io.ObjectOutputStream;
-import java.util.concurrent.ScheduledExecutorService;
 
-import main.sdis.common.CustomExecutorService;
 import main.sdis.common.MessageSender;
 import main.sdis.message.Message;
 import main.sdis.message.MessageHeader;
