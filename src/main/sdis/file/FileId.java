@@ -4,31 +4,29 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Objects;
 
-import main.sdis.chord.ChordSettings;
-import main.sdis.chord.Key;
 import main.sdis.common.Utils;
 
-public class FileId implements Serializable, Key {
+public class FileId implements Serializable {
 
     private static final long serialVersionUID = -7980391741390295314L;
 
-    private long value;
+    private byte[] hash;
 
     protected FileId() {};
 
     public FileId(String fileName, long lastModified, String owner, byte[] fileData) {
         try {
-            byte[] hash = generateId(fileName, lastModified, owner, fileData);
-            value = Utils.truncateHash(hash, ChordSettings.M);
+            hash = generateId(fileName, lastModified, owner, fileData);
         } catch (NoSuchAlgorithmException e) {
-            this.value = 0;
+            hash = null;
         }
     }
 
     public FileId(byte[] hash) {
-        value = Utils.truncateHash(hash, ChordSettings.M);
+        this.hash = hash;
     }
 
     private byte[] generateId(String fileName, long lastModified, String owner, byte[] fileData) throws NoSuchAlgorithmException {
@@ -50,9 +48,8 @@ public class FileId implements Serializable, Key {
         return hash;
     }
 
-    @Override
-    public long getValue() {
-        return value;
+    public byte[] getHash() {
+        return hash;
     }
 
     @Override
@@ -62,11 +59,11 @@ public class FileId implements Serializable, Key {
 
         FileId other = (FileId) obj;
 
-        return value == other.getValue();
+        return Arrays.equals(hash, other.hash);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(value);
+        return Objects.hashCode(hash);
     }
 }

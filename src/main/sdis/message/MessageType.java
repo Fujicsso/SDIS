@@ -8,11 +8,8 @@ public enum MessageType {
     DELETE,     // Delete a file
     REMOVED,    // Sent after a file is deleted by the reclaim protocol
     ALIVE,      // Tells a node that the node who sent the message is still up
-    GETSUCC,    // Ask for the address of the successor node of a given key
-    SUCC,       // Send the requested successor address (response to GETSUCC)
-    GETPRED,    // Ask for the node's predecessor's address
-    PRED,       // Send the node's predecessor's address (response to GETPRED)
-    IAMPRED,    // Tells a node that this is its new predecessor
+    CONNECT,    // Sent by a peer to connect to the server
+    CONNECTED,  // Sent by the server to a peer after a CONNECT request
     PING,       // Used to check if a given node is up
     PONG,       // Reply to PING message
     OK          // Generic reply message to messages that do not require a return value

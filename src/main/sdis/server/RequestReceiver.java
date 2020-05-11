@@ -1,9 +1,4 @@
-package main.sdis.peer;
-
-import main.sdis.common.CustomExecutorService;
-import main.sdis.common.Utils;
-import main.sdis.message.Message;
-import main.sdis.protocol.PingHandler;
+package main.sdis.server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,15 +7,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 
-public class MessageReceiver implements Runnable {
+import main.sdis.common.CustomExecutorService;
+import main.sdis.common.Utils;
+import main.sdis.message.Message;
 
-    private PeerImpl peer;
+public class RequestReceiver implements Runnable {
+    
+    private Server server;
     private ServerSocket socket;
     private ExecutorService executorService;
 
-    public MessageReceiver(PeerImpl peer) throws IOException {
-        this.peer = peer;
-        this.socket = new ServerSocket(this.peer.getAddress().getPort());
+    public RequestReceiver(Server server) throws IOException {
+        this.server = server;
+        this.socket = new ServerSocket(server.getAddress().getPort());
         executorService = CustomExecutorService.getInstance();
     }
 
@@ -32,13 +31,13 @@ public class MessageReceiver implements Runnable {
                 ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
                 Message message = (Message) in.readObject();
-
+        
                 Utils.safePrintln("MessageReceiver: RECEIVED MESSAGE FROM "
                         + Utils.formatAddress(message.getHeader().getSenderAddress()) + " [" + message + "]");
-
+    
                 switch (message.getHeader().getMessageType()) {
-                    case PING:
-                        executorService.execute(new PingHandler(peer, message, out));
+                    case CONNECT:
+                        executorService.execute(new ConnectionHandler(server, message, out));
                         break;
                 }
             } catch (IOException | ClassNotFoundException e) {
@@ -46,4 +45,5 @@ public class MessageReceiver implements Runnable {
             }
         }
     }
+    
 }
