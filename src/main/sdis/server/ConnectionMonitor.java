@@ -5,9 +5,8 @@ import java.util.Iterator;
 
 import main.sdis.common.MessageSender;
 import main.sdis.common.Utils;
-import main.sdis.message.Message;
-import main.sdis.message.MessageHeader;
-import main.sdis.message.MessageType;
+import main.sdis.message.PingMessage;
+import main.sdis.message.PongMessage;
 
 public class ConnectionMonitor implements Runnable {
 
@@ -25,11 +24,10 @@ public class ConnectionMonitor implements Runnable {
             // TODO: Ping each client in a separate thread
             Connection connection = itr.next();
 
-            MessageHeader header = new MessageHeader(MessageType.PING, server.getAddress());
-            Message message = new Message(header);
+            PingMessage message = new PingMessage(server.getAddress());
 
-            Message response = new MessageSender().sendMessage(message, connection.getClientAddress().getAddress(),
-                    connection.getClientAddress().getPort());
+            PongMessage response = new MessageSender().<PongMessage>sendMessage(message,
+                    connection.getClientAddress().getAddress(), connection.getClientAddress().getPort());
 
             if (response == null)
                 itr.remove();

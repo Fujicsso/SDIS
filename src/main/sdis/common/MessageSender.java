@@ -18,7 +18,7 @@ public class MessageSender {
      * @param destPort    the destination port number
      * @return a response message
      */
-    public Message sendMessage(Message message, InetAddress destAddress, int destPort) {
+    public <T extends Message> T sendMessage(Message message, InetAddress destAddress, int destPort) {
         try {
             Socket socket = new Socket(destAddress, destPort);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
@@ -28,9 +28,9 @@ public class MessageSender {
 
             Utils.safePrintln("SENT MESSAGE [" + message + "] TO " + Utils.formatAddress(destAddress, destPort));
 
-            Message response = (Message) in.readObject();
+            T response = (T) in.readObject();
 
-            Utils.safePrintln("REPLY FROM " + Utils.formatAddress(response.getHeader().getSenderAddress()) + " [" + response + "]");
+            Utils.safePrintln("REPLY FROM " + Utils.formatAddress(response.getSenderAddress()) + " [" + response + "]");
 
             socket.close();
             out.close();

@@ -5,8 +5,9 @@ import java.net.InetSocketAddress;
 
 import main.sdis.common.ConnectionFailedException;
 import main.sdis.common.NodeImpl;
+import main.sdis.message.ConnectMessage;
+import main.sdis.message.ConnectedMessage;
 import main.sdis.message.Message;
-import main.sdis.message.MessageHeader;
 import main.sdis.message.MessageType;
 
 public class PeerImpl extends NodeImpl implements Peer {
@@ -28,12 +29,12 @@ public class PeerImpl extends NodeImpl implements Peer {
     }
 
     private void connect(InetSocketAddress serverAddress) throws ConnectionFailedException {
-        MessageHeader header = new MessageHeader(MessageType.CONNECT, address);
-        Message message = new Message(header);
+        ConnectMessage message = new ConnectMessage(address);
 
-        Message response = messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
+        ConnectedMessage response = messageSender.<ConnectedMessage>sendMessage(message, serverAddress.getAddress(),
+                serverAddress.getPort());
 
-        if (response == null || response.getHeader().getMessageType() != MessageType.CONNECTED)
+        if (response == null)
             throw new ConnectionFailedException("Could not connect to server.");
     }
 

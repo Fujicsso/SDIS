@@ -4,8 +4,7 @@ import java.io.ObjectOutputStream;
 
 import main.sdis.common.Node;
 import main.sdis.message.Message;
-import main.sdis.message.MessageHeader;
-import main.sdis.message.MessageType;
+import main.sdis.message.PongMessage;
 
 public class PingHandler extends Handler implements Runnable {
 
@@ -15,8 +14,7 @@ public class PingHandler extends Handler implements Runnable {
 
     @Override
     public void run() {
-        MessageHeader responseHeader = new MessageHeader(MessageType.PONG, node.getAddress());
-        Message responseMessage = new Message(responseHeader);
+        PongMessage responseMessage = new PongMessage(node.getAddress());
 
         messageSender.reply(out, responseMessage);
     }

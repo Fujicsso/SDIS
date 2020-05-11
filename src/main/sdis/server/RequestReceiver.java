@@ -33,9 +33,9 @@ public class RequestReceiver implements Runnable {
                 Message message = (Message) in.readObject();
         
                 Utils.safePrintln("MessageReceiver: RECEIVED MESSAGE FROM "
-                        + Utils.formatAddress(message.getHeader().getSenderAddress()) + " [" + message + "]");
+                        + Utils.formatAddress(message.getSenderAddress()) + " [" + message + "]");
     
-                switch (message.getHeader().getMessageType()) {
+                switch (message.getMessageType()) {
                     case CONNECT:
                         executorService.execute(new ConnectionHandler(server, message, out));
                         break;
