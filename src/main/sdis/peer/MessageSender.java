@@ -29,11 +29,11 @@ public class MessageSender {
 
             out.writeObject(message);
 
-            Utils.safePrintln(message + " --> " + Utils.formatAddress(destAddress, destPort));
+            Utils.safePrintln("SENT MESSAGE [" + message + "] TO " + Utils.formatAddress(destAddress, destPort));
 
             Message response = (Message) in.readObject();
 
-            Utils.safePrintln("Reply from " + Utils.formatAddress(message.getHeader().getSenderAddress()) + " --> " + response);
+            Utils.safePrintln("REPLY FROM " + Utils.formatAddress(response.getHeader().getSenderAddress()) + " [" + response + "]");
 
             socket.close();
             out.close();

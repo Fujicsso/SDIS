@@ -37,8 +37,8 @@ public class MessageReceiver implements Runnable {
                 ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
                 Message message = (Message) in.readObject();
 
-                Utils.safePrintln("MessageReceiver: received message from "
-                        + Utils.formatAddress(message.getHeader().getSenderAddress()) + " --> " + message);
+                Utils.safePrintln("MessageReceiver: RECEIVED MESSAGE FROM "
+                        + Utils.formatAddress(message.getHeader().getSenderAddress()) + " [" + message + "]");
 
                 switch (message.getHeader().getMessageType()) {
                     case GETPRED:
@@ -48,7 +48,7 @@ public class MessageReceiver implements Runnable {
                         executorService.execute(new GetSuccHandler(node, message, out));
                         break;
                     case IAMPRED:
-                        executorService.execute(new IAmPredHandler(node, message));
+                        executorService.execute(new IAmPredHandler(node, message, out));
                         break;
                     case PING:
                         executorService.execute(new PingHandler(node, message, out));

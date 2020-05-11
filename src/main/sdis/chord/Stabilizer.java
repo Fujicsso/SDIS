@@ -21,6 +21,7 @@ public class Stabilizer implements Runnable {
 
     @Override
     public void run() {
+        Utils.safePrintln("Stabilizer started");
         InetSocketAddress succAddress = node.getSuccessorAddress();
 
         MessageHeader header = new MessageHeader(MessageType.GETPRED, node.getAddress());
@@ -31,16 +32,24 @@ public class Stabilizer implements Runnable {
                 .getHeader();
 
         InetSocketAddress succPredAddress = responseHeader.getArg();
+
+        if (succPredAddress == null) return;
+
         Key succPredKey = new NodeKey(succPredAddress);
 
-        if (Utils.isKeyInOpenInterval(succPredKey, node.getKey(), node.getSuccessorKey()))
+        if (Utils.isKeyInInterval(succPredKey, node.getKey(), node.getSuccessorKey()))
             node.setSuccessor(succPredAddress);
 
-        header = new MessageHeader(MessageType.IAMPRED, node.getAddress());
-        message = new Message(header);
-
-        messageSender.sendMessage(message, succPredAddress.getAddress(), succPredAddress.getPort());
-        // TODO: check for OK?
+        // Avoid sending IAMPRED message to itself
+        if (!node.getAddress().equals(succPredAddress)) {
+            header = new MessageHeader(MessageType.IAMPRED, node.getAddress());
+            message = new Message(header);
+    
+            messageSender.sendMessage(message, succPredAddress.getAddress(), succPredAddress.getPort());
+        } else {
+            node.notify(node.getAddress());
+        }
+        Utils.safePrintln("Stabilizer finished");
     }
 
 }

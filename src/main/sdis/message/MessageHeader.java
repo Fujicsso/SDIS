@@ -34,8 +34,7 @@ public class MessageHeader implements Serializable {
     public String toString() {
         StringJoiner sj = new StringJoiner(" ");
 
-        sj.add(messageType.toString())
-            .add(senderAddress.toString());
+        sj.add(messageType.toString());
 
         return sj.toString();
     }

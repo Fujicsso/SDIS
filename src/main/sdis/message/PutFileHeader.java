@@ -15,6 +15,8 @@ public class PutFileHeader extends MessageHeader {
     private FileId fileId;
     private int replicationDegree;
 
+    protected PutFileHeader() {}
+
     public PutFileHeader(MessageType messageType, InetSocketAddress senderAddress, FileId fileId,
             int replicationDegree) {
         super(messageType, senderAddress);

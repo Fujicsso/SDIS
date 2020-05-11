@@ -18,7 +18,7 @@ public class NodeKey implements Key {
 
 	/**
 	 * Constructs a Key for a given InetSocketAddress by applying the
-	 * SHA-256 hashing algorithm on an address:port_number string
+	 * an hashing algorithm on an address:port_number string
 	 * @param address
 	 */
 	public NodeKey(InetSocketAddress address) {

@@ -1,5 +1,6 @@
 package main.sdis.chord;
 
+import main.sdis.common.Utils;
 import main.sdis.message.Message;
 import main.sdis.message.MessageHeader;
 import main.sdis.message.MessageType;
@@ -17,18 +18,22 @@ public class PredecessorChecker implements Runnable {
 
     @Override
     public void run() {
+        Utils.safePrintln("Predecessor checker started");
+        if (node.getPredecessor() == null) {
+            Utils.safePrintln("Predecessor checker finished");
+            return;
+        }
+
         MessageHeader header = new MessageHeader(MessageType.PING, node.getAddress());
         Message message = new Message(header);
-
-        // Avoid sending a PING message to itself
-        if (node.getAddress().equals(node.getPredecessor()))
-            return;
 
         Message responseMessage = messageSender.sendMessage(message, node.getPredecessor().getAddress(),
                 node.getPredecessor().getPort());
 
         if (responseMessage == null || responseMessage.getHeader().getMessageType() != MessageType.PONG)
             node.setPredecessor(null);
+
+        Utils.safePrintln("Predecessor checker finished, new pred: " + node.getPredecessor());
     }
 
 }

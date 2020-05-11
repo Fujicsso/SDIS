@@ -14,6 +14,8 @@ public class FingerFixer implements Runnable {
 
     @Override
     public void run() {
+        Utils.safePrintln("FingerFixer Started");
+
         if (node.getFingerToFix() > ChordSettings.M - 1)
             node.resetFingerToFix();
 

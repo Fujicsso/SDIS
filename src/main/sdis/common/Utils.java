@@ -93,7 +93,11 @@ public class Utils {
      * @return true if the key belongs to the interval, false if otherwise
      */
     public static boolean isKeyInInterval(Key key, Key lower, Key upper) {
-        return key.getValue() > lower.getValue() && key.getValue() <= upper.getValue();
+        if (lower.getValue() < upper.getValue()) {
+            return key.getValue() > lower.getValue() && key.getValue() <= upper.getValue();
+        } else {
+            return key.getValue() > lower.getValue() || key.getValue() <= upper.getValue();
+        }
     }
 
     /**
@@ -104,7 +108,11 @@ public class Utils {
      * @return true if the key belongs to the interval, false if otherwise
      */
     public static boolean isKeyInOpenInterval(Key key, Key lower, Key upper) {
-        return key.getValue() > lower.getValue() && key.getValue() < upper.getValue();
+        if (lower.getValue() < upper.getValue()) {
+            return key.getValue() > lower.getValue() && key.getValue() < upper.getValue();
+        } else {
+            return key.getValue() > lower.getValue() || key.getValue() < upper.getValue();
+        }
     }
 
     /**

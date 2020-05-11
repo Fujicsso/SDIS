@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import main.sdis.common.CustomExecutorService;
 import main.sdis.common.Utils;
 import main.sdis.message.Message;
+import main.sdis.message.MessageHeader;
 import main.sdis.message.MessageType;
 import main.sdis.message.SingleArgumentHeader;
 import main.sdis.peer.MessageReceiver;
@@ -37,6 +38,12 @@ public class ChordNodeImpl implements ChordNode {
      * @throws IOException
      */
     public ChordNodeImpl(InetSocketAddress address) throws IOException {
+        this.address = address;
+        nodeKey = new NodeKey(address);
+        messageSender = new MessageSender();
+
+        initFingerTable();
+        setSuccessor(address);
         init(address);
     }
 
@@ -48,9 +55,14 @@ public class ChordNodeImpl implements ChordNode {
      * @throws IOException
      */
     public ChordNodeImpl(InetSocketAddress address, InetSocketAddress contact) throws IOException {
-        init(address);
+        this.address = address;
+        nodeKey = new NodeKey(address);
         this.contact = contact;
+        messageSender = new MessageSender();
+
+        initFingerTable();
         join();
+        init(address);
     }
 
     /**
@@ -60,14 +72,6 @@ public class ChordNodeImpl implements ChordNode {
      * @throws IOException
      */
     private void init(InetSocketAddress address) throws IOException {
-        this.address = address;
-        nodeKey = new NodeKey(address);
-        initFingerTable();
-
-        fingerTable.set(0, new FingerTableEntry(nodeKey, address));
-        Utils.printFingerTable(fingerTable);
-        predecessor = address;
-
         messageSender = new MessageSender();
 
         executorService = CustomExecutorService.getInstance();
@@ -95,8 +99,7 @@ public class ChordNodeImpl implements ChordNode {
                 .getHeader();
 
         InetSocketAddress successorAddress = responseHeader.getArg();
-        Key successorKey = new NodeKey(successorAddress);
-        setFingerTableEntry(new FingerTableEntry(successorKey, successorAddress), 0);
+        setSuccessor(successorAddress);
     }
 
     @Override
@@ -160,10 +163,10 @@ public class ChordNodeImpl implements ChordNode {
 
     @Override
     public InetSocketAddress getClosestPrecedingNode(Key key) {
-        for (int i = ChordSettings.M - 1; i > 0; i--) {
+        for (int i = ChordSettings.M - 1; i >= 0; i--) {
             FingerTableEntry finger = getFingerTableEntry(i);
 
-            if (finger != null && Utils.isKeyInOpenInterval(finger.getKey(), nodeKey, key))
+            if (finger != null && Utils.isKeyInInterval(finger.getKey(), nodeKey, key))
                 return finger.getAddress();
         }
         return address;
@@ -181,11 +184,18 @@ public class ChordNodeImpl implements ChordNode {
 
     @Override
     public synchronized void notify(InetSocketAddress nodeAddress) {
+        if (predecessor == null) {
+            predecessor = nodeAddress;
+            return;
+        }
+
         Key key = new NodeKey(nodeAddress);
         Key predecessorKey = new NodeKey(predecessor);
 
-        if (predecessor == null || Utils.isKeyInOpenInterval(key, predecessorKey, nodeKey))
+        if (!nodeAddress.equals(address) && Utils.isKeyInOpenInterval(key, predecessorKey, nodeKey))
             predecessor = nodeAddress;
+
+        Utils.safePrintln("PREDECESSOR = " + predecessor);
     }
 
     @Override
@@ -225,7 +235,21 @@ public class ChordNodeImpl implements ChordNode {
 
     @Override
     public void setSuccessor(InetSocketAddress address) {
-        FingerTableEntry successor = new FingerTableEntry(new NodeKey(address), address);
-        setFingerTableEntry(successor, 0);
+        if (this.address.equals(address)) {
+            // Avoid sending an IAMPRED message to itself
+            // If the node is its own successor, then it will also be it's own predecessor
+            FingerTableEntry successor = new FingerTableEntry(new NodeKey(address), address);
+            setFingerTableEntry(successor, 0);
+            setPredecessor(this.address);
+        } else {
+            FingerTableEntry successor = new FingerTableEntry(new NodeKey(address), address);
+            setFingerTableEntry(successor, 0);
+
+            MessageHeader header = new MessageHeader(MessageType.IAMPRED, address);
+            Message message = new Message(header);
+    
+            // Notify the new successor that this is their new predecessor
+            messageSender.sendMessage(message, address.getAddress(), address.getPort());
+        }
     }
 }

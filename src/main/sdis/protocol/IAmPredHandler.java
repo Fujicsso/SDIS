@@ -1,14 +1,17 @@
 package main.sdis.protocol;
 
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 
 import main.sdis.chord.ChordNode;
 import main.sdis.message.Message;
+import main.sdis.message.MessageHeader;
+import main.sdis.message.MessageType;
 
 public class IAmPredHandler extends Handler implements Runnable {
 
-    public IAmPredHandler(ChordNode node, Message message) {
-        super(node, message);
+    public IAmPredHandler(ChordNode node, Message message, ObjectOutputStream out) {
+        super(node, message, out);
     }
 
     @Override
@@ -17,7 +20,10 @@ public class IAmPredHandler extends Handler implements Runnable {
 
         node.notify(newPredAddress);
 
-        // TODO: reply with OK?
+        MessageHeader responseHeader = new MessageHeader(MessageType.OK, node.getAddress());
+        Message responseMessage = new Message(responseHeader);
+
+        messageSender.reply(out, responseMessage);
     }
     
 }

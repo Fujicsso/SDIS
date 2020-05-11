@@ -14,6 +14,8 @@ public class SingleArgumentHeader<Serializable> extends MessageHeader {
     private static final long serialVersionUID = -1031205545252007158L;
     private Serializable arg;
 
+    protected SingleArgumentHeader() {}
+
     public SingleArgumentHeader(MessageType messageType, InetSocketAddress senderAddress,
             Serializable arg) {
         super(messageType, senderAddress);

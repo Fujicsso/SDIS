@@ -7,5 +7,5 @@ public class ChordSettings {
     public static final int M = 8;
 
     // Name of the hash function used to hash Keys
-    public static final String HASH_FUNCTION = "SHA-256";
+    public static final String HASH_FUNCTION = "SHA-1";
 }
