@@ -13,6 +13,7 @@ public class MessageSender {
     /**
      * Sends a message to the given address and returns a response message
      * 
+     * @param <T> any type that extends Message
      * @param message     the message to send
      * @param destAddress the destination address
      * @param destPort    the destination port number

@@ -3,7 +3,8 @@ package main.sdis.peer;
 import main.sdis.common.CustomExecutorService;
 import main.sdis.common.Utils;
 import main.sdis.message.Message;
-import main.sdis.protocol.PingHandler;
+import main.sdis.peer.protocol.PingHandler;
+import main.sdis.peer.protocol.PutFileHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -40,6 +41,8 @@ public class MessageReceiver implements Runnable {
                     case PING:
                         executorService.execute(new PingHandler(peer, message, out));
                         break;
+                    case PUTFILE:
+                        executorService.execute(new PutFileHandler(peer, message, out));
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

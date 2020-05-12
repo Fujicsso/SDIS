@@ -8,6 +8,9 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -86,5 +89,11 @@ public class Utils {
 
     public static String formatAddress(InetAddress address, int port) {
         return address.toString() + ":" + port;
+    }
+
+    public static <T> List<T> randomSubList(List<T> list, int newSize) {
+        list = new ArrayList<>(list);
+        Collections.shuffle(list);
+        return list.subList(0, newSize);
     }
 }
