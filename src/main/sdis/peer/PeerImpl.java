@@ -17,15 +17,13 @@ import main.sdis.message.PutFileMessage;
 
 public class PeerImpl extends NodeImpl implements Peer {
 
-    private int identifier;
     private String accessPoint;
     private InetSocketAddress serverAddress;
     private MessageSender messageSender;
 
-    public PeerImpl(int identifier, String accessPoint, InetSocketAddress address, InetSocketAddress serverAddress)
+    public PeerImpl(String accessPoint, InetSocketAddress address, InetSocketAddress serverAddress)
             throws IOException, ConnectionFailedException {
         super(address);
-        this.identifier = identifier;
         this.accessPoint = accessPoint;
         this.serverAddress = serverAddress;
         messageSender = new MessageSender();
@@ -43,11 +41,6 @@ public class PeerImpl extends NodeImpl implements Peer {
 
         if (response == null)
             throw new ConnectionFailedException("Could not connect to server.");
-    }
-
-    @Override
-    public int getIdentifier() {
-        return identifier;
     }
 
     @Override

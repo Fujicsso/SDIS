@@ -13,11 +13,10 @@ public class StartPeer {
         System.setProperty("java.net.preferIPv4Stack", "true");
 
         try {
-            int identifier = Integer.parseInt(args[0]);
-            String accessPoint = args[1];
-            int port = Integer.parseInt(args[2]);
-            String serverHostname = args[3];
-            int serverPort = Integer.parseInt(args[4]);
+            String accessPoint = args[0];
+            int port = Integer.parseInt(args[1]);
+            String serverHostname = args[2];
+            int serverPort = Integer.parseInt(args[3]);
 
             // RMI Registry should be run on the root directory of .class files
             Registry registry = LocateRegistry.getRegistry();
@@ -26,13 +25,13 @@ public class StartPeer {
 
             InetSocketAddress serverAddress = new InetSocketAddress(serverHostname, serverPort);
 
-            Peer peer = new PeerImpl(identifier, accessPoint, address, serverAddress);
+            Peer peer = new PeerImpl(accessPoint, address, serverAddress);
             
             Peer stub = (Peer) UnicastRemoteObject.exportObject(peer, 0);
 
             registry.rebind(accessPoint, stub);
 
-            Utils.safePrintf("Peer %d Ready on Access Point %s\n", peer.getIdentifier(), peer.getAccessPoint());
+            Utils.safePrintf("Peer Ready on Access Point %s\n", peer.getAccessPoint());
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();

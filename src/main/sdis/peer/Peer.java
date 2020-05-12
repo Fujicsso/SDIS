@@ -17,7 +17,5 @@ public interface Peer extends Remote {
 
     void retrieveState() throws RemoteException;
 
-    int getIdentifier() throws RemoteException;
-
     String getAccessPoint() throws RemoteException;
 }
