@@ -18,8 +18,8 @@ public class Server extends NodeImpl {
     private List<Connection> connections;
 
     // Stores all files that have been backed up in the system
-    // and their current replication degree
-    private Map<FileId, Integer> backedUpFiles;
+    // and the list of peers who saved each file
+    private Map<FileId, List<InetSocketAddress>> backedUpFiles;
 
     public Server(InetSocketAddress address) throws IOException {
         super(address);
@@ -42,16 +42,21 @@ public class Server extends NodeImpl {
         return connections;
     }
 
-    public void addBackedUpFile(FileId fileId) {
-        if (backedUpFiles.containsKey(fileId))
-            backedUpFiles.put(fileId, backedUpFiles.get(fileId) + 1);
-        else
-            backedUpFiles.put(fileId, 1);
+    public synchronized void addBackedUpFile(FileId fileId, InetSocketAddress peerAddress) {
+        List<InetSocketAddress> peers = backedUpFiles.computeIfAbsent(fileId,
+                id -> Collections.synchronizedList(new ArrayList<>()));
 
-        Utils.safePrintln("File: " + fileId + " Rep: " + backedUpFiles.get(fileId));
+        if (!peers.contains(peerAddress))
+            peers.add(peerAddress);
+
+        Utils.safePrintln("File: " + fileId + " Rep: " + getFileReplicationDegree(fileId));
     }
 
-    public boolean hasBackedUpFile(FileId fileId) {
+    public synchronized boolean hasBackedUpFile(FileId fileId) {
         return backedUpFiles.containsKey(fileId);
+    }
+
+    public synchronized int getFileReplicationDegree(FileId fileId) {
+        return backedUpFiles.get(fileId).size();
     }
 }

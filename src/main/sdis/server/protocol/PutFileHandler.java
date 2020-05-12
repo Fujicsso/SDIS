@@ -60,7 +60,7 @@ public class PutFileHandler implements Runnable {
                 
                 Utils.safePrintln("STORED MESSAGE: " + storedMessage.toString());
 
-                server.addBackedUpFile(message.getFileId());
+                server.addBackedUpFile(message.getFileId(), storedMessage.getSenderAddress());
             }
 
             OkMessage response = new OkMessage(server.getAddress());
