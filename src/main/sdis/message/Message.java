@@ -28,6 +28,10 @@ public abstract class Message implements Serializable {
         return senderAddress;
     }
 
+    public boolean isBroadcastable() {
+        return isBroadcastable;
+    }
+
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(" ");
