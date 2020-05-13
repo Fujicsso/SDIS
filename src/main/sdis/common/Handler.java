@@ -4,10 +4,10 @@ import java.io.ObjectOutputStream;
 
 import main.sdis.message.Message;
 
-public class Handler {
+public class Handler<S extends Node, T extends Message> {
     
-    protected Node node;
-    protected Message message;
+    protected S node;
+    protected T message;
     protected ObjectOutputStream out;
     protected MessageSender messageSender;
 
@@ -16,7 +16,7 @@ public class Handler {
      * @param node the node which received the message
      * @param message the received message
      */
-    public Handler(Node node, Message message) {
+    public Handler(S node, T message) {
         this.node = node;
         this.message = message;
         this.messageSender = new MessageSender();
@@ -28,7 +28,7 @@ public class Handler {
      * @param message the received message
      * @param out the ObjectOutputStream of the socket to reply to
      */
-    public Handler(Node node, Message message, ObjectOutputStream out) {
+    public Handler(S node, T message, ObjectOutputStream out) {
         this.node = node;
         this.message = message;
         this.out = out;

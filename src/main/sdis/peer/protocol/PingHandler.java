@@ -3,14 +3,14 @@ package main.sdis.peer.protocol;
 import java.io.ObjectOutputStream;
 
 import main.sdis.common.Handler;
-import main.sdis.common.Node;
-import main.sdis.message.Message;
+import main.sdis.message.PingMessage;
 import main.sdis.message.PongMessage;
+import main.sdis.peer.PeerImpl;
 
-public class PingHandler extends Handler implements Runnable {
+public class PingHandler extends Handler<PeerImpl, PingMessage> implements Runnable {
 
-    public PingHandler(Node node, Message message, ObjectOutputStream out) {
-        super(node, message, out);
+    public PingHandler(PeerImpl peer, PingMessage message, ObjectOutputStream out) {
+        super(peer, message, out);
     }
 
     @Override
