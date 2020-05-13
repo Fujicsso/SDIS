@@ -24,12 +24,14 @@ public class PeerImpl extends NodeImpl implements Peer {
     private String accessPoint;
     private InetSocketAddress serverAddress;
     private MessageSender messageSender;
+    private Storage storage;
 
     public PeerImpl(String accessPoint, InetSocketAddress address, InetSocketAddress serverAddress)
             throws IOException, ConnectionFailedException {
         super(address);
         this.accessPoint = accessPoint;
         this.serverAddress = serverAddress;
+        storage = new Storage(address);
         messageSender = new MessageSender();
 
         connect(serverAddress);
@@ -68,11 +70,12 @@ public class PeerImpl extends NodeImpl implements Peer {
 
         Message response = messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
 
-        if (response.getMessageType() == MessageType.OK) {
+        if (response == null)
+            Utils.safePrintln("An unexpected error occured");
+        else if (response.getMessageType() == MessageType.OK)
             Utils.safePrintln("Backup successful");
-        } else {
+        else if (response.getMessageType() == MessageType.ERROR)
             Utils.safePrintln(((ErrorMessage) response).getErrorDetails());
-        }
     }
 
     @Override
@@ -93,5 +96,9 @@ public class PeerImpl extends NodeImpl implements Peer {
     @Override
     public void retrieveState() {
         throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public Storage getStorage() {
+        return storage;
     }
 }

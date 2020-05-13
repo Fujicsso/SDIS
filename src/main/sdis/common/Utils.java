@@ -84,7 +84,7 @@ public class Utils {
     }
     
     public static String formatAddress(InetSocketAddress address) {
-        return address.toString() + ":" + address.getPort();
+        return address.getAddress().getHostAddress().toString() + ":" + address.getPort();
     }
 
     public static String formatAddress(InetAddress address, int port) {
