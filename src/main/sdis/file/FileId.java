@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 
 public class FileId implements Serializable {
@@ -12,6 +13,7 @@ public class FileId implements Serializable {
     private static final long serialVersionUID = -7980391741390295314L;
 
     private byte[] hash;
+    private String fileName;
 
     protected FileId() {};
 
@@ -21,10 +23,8 @@ public class FileId implements Serializable {
         } catch (NoSuchAlgorithmException e) {
             hash = null;
         }
-    }
 
-    public FileId(byte[] hash) {
-        this.hash = hash;
+        this.fileName = fileName;
     }
 
     private byte[] generateId(String fileName, long lastModified, String owner, byte[] fileData) throws NoSuchAlgorithmException {
@@ -50,6 +50,10 @@ public class FileId implements Serializable {
         return hash;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -62,6 +66,11 @@ public class FileId implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(hash);
+        return Arrays.hashCode(hash);
+    }
+
+    @Override
+    public String toString() {
+        return Base64.getUrlEncoder().encodeToString(hash);
     }
 }

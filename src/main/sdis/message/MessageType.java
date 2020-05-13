@@ -7,10 +7,10 @@ public enum MessageType {
     FILE,       // Send a requested file (response to GETFILE)
     DELETE,     // Delete a file
     REMOVED,    // Sent after a file is deleted by the reclaim protocol
-    ALIVE,      // Tells a node that the node who sent the message is still up
     CONNECT,    // Sent by a peer to connect to the server
     CONNECTED,  // Sent by the server to a peer after a CONNECT request
     PING,       // Used to check if a given node is up
     PONG,       // Reply to PING message
-    OK          // Generic reply message to messages that do not require a return value
+    OK,         // Used as reply when operation is successful
+    ERROR       // Used as a reply when operation returns an error
 }

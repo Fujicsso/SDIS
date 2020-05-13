@@ -10,9 +10,13 @@ import java.nio.file.Paths;
 import main.sdis.common.ConnectionFailedException;
 import main.sdis.common.MessageSender;
 import main.sdis.common.NodeImpl;
+import main.sdis.common.Utils;
 import main.sdis.file.FileId;
 import main.sdis.message.ConnectMessage;
 import main.sdis.message.ConnectedMessage;
+import main.sdis.message.ErrorMessage;
+import main.sdis.message.Message;
+import main.sdis.message.MessageType;
 import main.sdis.message.PutFileMessage;
 
 public class PeerImpl extends NodeImpl implements Peer {
@@ -62,7 +66,13 @@ public class PeerImpl extends NodeImpl implements Peer {
 
         PutFileMessage message = new PutFileMessage(address, fileId, fileBytes, replicationDegree);
 
-        messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
+        Message response = messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
+
+        if (response.getMessageType() == MessageType.OK) {
+            Utils.safePrintln("Backup successful");
+        } else {
+            Utils.safePrintln(((ErrorMessage) response).getErrorDetails());
+        }
     }
 
     @Override

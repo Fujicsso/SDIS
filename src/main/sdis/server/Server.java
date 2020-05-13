@@ -31,7 +31,8 @@ public class Server extends NodeImpl {
     }
 
     public synchronized void addConnection(Connection connection) {
-        connections.add(connection);
+        if (!connections.contains(connection))
+            connections.add(connection);
     }
 
     public synchronized void removeConnection(Connection connection) {
@@ -54,6 +55,10 @@ public class Server extends NodeImpl {
 
     public synchronized boolean hasBackedUpFile(FileId fileId) {
         return backedUpFiles.containsKey(fileId);
+    }
+
+    public synchronized List<InetSocketAddress> getPeersOfBackedUpFile(FileId fileId) {
+        return backedUpFiles.get(fileId);
     }
 
     public synchronized int getFileReplicationDegree(FileId fileId) {

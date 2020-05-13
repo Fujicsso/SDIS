@@ -94,6 +94,9 @@ public class Utils {
     public static <T> List<T> randomSubList(List<T> list, int newSize) {
         list = new ArrayList<>(list);
         Collections.shuffle(list);
-        return list.subList(0, newSize);
+        if (newSize < list.size())
+            return list.subList(0, newSize);
+        else
+            return list;
     }
 }
