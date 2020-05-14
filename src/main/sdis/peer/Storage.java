@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import main.sdis.common.Utils;
@@ -15,7 +17,8 @@ public class Storage {
     private static final long DEFAULT_DISK_SIZE = 1000000000L;
     private static final String BACKUP_DIRECTORY = "backup" + File.separatorChar;
     private static final String RESTORED_DIRECTORY = "restore" + File.separatorChar;
-    private static final String BACKED_UP_FILES_FILE = "backed_up_files";
+    private static final String DATA_DIRECTORY = "data" + File.separatorChar;
+    private static final String SAVED_FILES_FILE = "backed_up_files";
 
     private String storageDir;
     private long maxDiskSize;
@@ -24,12 +27,16 @@ public class Storage {
     public Storage(InetSocketAddress peerAddress) {
         maxDiskSize = DEFAULT_DISK_SIZE;
         storageDir = Utils.formatAddress(peerAddress) + File.separatorChar;
-        savedFiles = new ArrayList<>();
+        savedFiles = Collections.synchronizedList(new ArrayList<>());
 
         File backupDir = new File(storageDir + BACKUP_DIRECTORY);
         File restoreDir = new File(storageDir + RESTORED_DIRECTORY);
+        File dataDir = new File(storageDir + DATA_DIRECTORY);
         backupDir.mkdirs();
         restoreDir.mkdirs();
+        dataDir.mkdirs();
+
+        loadSavedFiles();
     }
 
     public void setMaxDiskSize(long maxDiskSize) {
@@ -49,8 +56,25 @@ public class Storage {
             fos.write(fileData);
 
             savedFiles.add(fileId);
+            saveSavedFiles();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadSavedFiles() {
+        File file = new File(storageDir + DATA_DIRECTORY + SAVED_FILES_FILE);
+
+        Object deserialized = Utils.deserializeObject(file);
+
+        if (deserialized != null)
+            savedFiles = (List<FileId>) deserialized;
+
+        System.out.println(Arrays.toString(savedFiles.toArray()));
+    }
+
+    private void saveSavedFiles() {
+        File file = new File(storageDir + DATA_DIRECTORY + SAVED_FILES_FILE);
+        Utils.serializeObject(file, savedFiles);
     }
 }
