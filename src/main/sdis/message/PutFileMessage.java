@@ -12,7 +12,7 @@ public class PutFileMessage extends Message {
     private int replicationDegree;
 
     public PutFileMessage(InetSocketAddress senderAddress, FileId fileId, byte[] fileData, int replicationDegree) {
-    super(MessageType.PUTFILE, senderAddress, true);
+        super(MessageType.PUTFILE, senderAddress, true);
         this.fileId = fileId;
         this.fileData = fileData;
         this.replicationDegree = replicationDegree;
