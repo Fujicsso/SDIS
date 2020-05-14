@@ -46,8 +46,8 @@ public class PutFileHandler implements Runnable {
         // The user can trigger a new backup of the file if the desired replication
         // degree
         // Is greater than the current replication degree
-        if (server.hasBackedUpFile(message.getFileId())
-                && message.getReplicationDegree() <= server.getFileReplicationDegree(message.getFileId())) {
+        if (server.getStorage().hasBackedUpFile(message.getFileId()) && message.getReplicationDegree() <= server
+                .getStorage().getFileReplicationDegree(message.getFileId())) {
             replyError("File has already been backed up with desired replication degree");
             return;
         }
@@ -63,7 +63,7 @@ public class PutFileHandler implements Runnable {
             }
 
             List<PutFileSender> putFileTasks = new ArrayList<>();
-            List<InetSocketAddress> peersOfFile = server.getPeersOfBackedUpFile(message.getFileId());
+            List<InetSocketAddress> peersOfFile = server.getStorage().getPeersOfBackedUpFile(message.getFileId());
 
             List<Connection> randomConnections = new ArrayList<>(server.getConnections());
             randomConnections.removeIf(conn -> conn.getClientAddress().equals(message.getSenderAddress())
@@ -81,14 +81,14 @@ public class PutFileHandler implements Runnable {
 
                     Utils.safePrintln("STORED MESSAGE: " + storedMessage.toString());
 
-                    server.addBackedUpFile(message.getFileId(), storedMessage.getSenderAddress());
+                    server.getStorage().addBackedUpFile(message.getFileId(), storedMessage.getSenderAddress());
                 }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
 
             // Check if desired replication degree has been reached
-            if (server.getFileReplicationDegree(message.getFileId()) >= message.getReplicationDegree())
+            if (server.getStorage().getFileReplicationDegree(message.getFileId()) >= message.getReplicationDegree())
                 reachedDesiredRepDegree = true;
             else
                 Utils.safePrintln("Could not reach desired replication degree. Retrying...");
@@ -100,7 +100,7 @@ public class PutFileHandler implements Runnable {
             replyOk();
         } else {
             replyError("Could not backup file with desired replication degree. Current replication degree is "
-                    + server.getFileReplicationDegree(message.getFileId()));
+                    + server.getStorage().getFileReplicationDegree(message.getFileId()));
         }
     }
 

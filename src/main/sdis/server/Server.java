@@ -1,5 +1,6 @@
 package main.sdis.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -16,15 +17,13 @@ import main.sdis.file.FileId;
 public class Server extends NodeImpl {
     
     private List<Connection> connections;
-
-    // Stores all files that have been backed up in the system
-    // and the list of peers who saved each file
-    private Map<FileId, List<InetSocketAddress>> backedUpFiles;
+    private Storage storage;
+    
 
     public Server(InetSocketAddress address) throws IOException {
         super(address);
         this.connections = Collections.synchronizedList(new ArrayList<>());
-        this.backedUpFiles = new ConcurrentHashMap<>();
+        storage = new Storage();
 
         executorService.execute(new RequestReceiver(this));
         executorService.scheduleAtFixedRate(new ConnectionMonitor(this), 0, 10, TimeUnit.SECONDS);
@@ -43,25 +42,7 @@ public class Server extends NodeImpl {
         return connections;
     }
 
-    public synchronized void addBackedUpFile(FileId fileId, InetSocketAddress peerAddress) {
-        List<InetSocketAddress> peers = backedUpFiles.computeIfAbsent(fileId,
-                id -> Collections.synchronizedList(new ArrayList<>()));
-
-        if (!peers.contains(peerAddress))
-            peers.add(peerAddress);
-
-        Utils.safePrintln("File: " + fileId + " Rep: " + getFileReplicationDegree(fileId));
-    }
-
-    public synchronized boolean hasBackedUpFile(FileId fileId) {
-        return backedUpFiles.containsKey(fileId);
-    }
-
-    public synchronized List<InetSocketAddress> getPeersOfBackedUpFile(FileId fileId) {
-        return backedUpFiles.get(fileId);
-    }
-
-    public synchronized int getFileReplicationDegree(FileId fileId) {
-        return backedUpFiles.get(fileId).size();
+    public Storage getStorage() {
+        return storage;
     }
 }
