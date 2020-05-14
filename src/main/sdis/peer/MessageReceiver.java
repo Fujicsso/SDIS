@@ -2,9 +2,11 @@ package main.sdis.peer;
 
 import main.sdis.common.CustomExecutorService;
 import main.sdis.common.Utils;
+import main.sdis.message.GetFileMessage;
 import main.sdis.message.Message;
 import main.sdis.message.PingMessage;
 import main.sdis.message.PutFileMessage;
+import main.sdis.peer.protocol.GetFileHandler;
 import main.sdis.peer.protocol.PingHandler;
 import main.sdis.peer.protocol.PutFileHandler;
 
@@ -45,6 +47,9 @@ public class MessageReceiver implements Runnable {
                         break;
                     case PUTFILE:
                         executorService.execute(new PutFileHandler(peer, (PutFileMessage) message, out));
+                        break;
+                    case GETFILE:
+                        executorService.execute(new GetFileHandler(peer, (GetFileMessage) message, out));
                         break;
                 }
             } catch (IOException | ClassNotFoundException e) {

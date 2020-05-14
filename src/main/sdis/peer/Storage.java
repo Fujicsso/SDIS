@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +50,7 @@ public class Storage {
     }
 
     public synchronized void saveFile(FileId fileId, byte[] fileData) {
-        File file = Utils.createFileAndDir(storageDir + BACKUP_DIRECTORY, fileId.getFileName());
+        File file = Utils.createFileAndDir(storageDir + BACKUP_DIRECTORY, fileId.toString());
 
         FileOutputStream fos = null;
         try {
@@ -76,5 +78,38 @@ public class Storage {
     private void saveSavedFiles() {
         File file = new File(storageDir + DATA_DIRECTORY + SAVED_FILES_FILE);
         Utils.serializeObject(file, savedFiles);
+    }
+
+    public synchronized byte[] getFileData(FileId fileId) {
+        File file = new File(storageDir + BACKUP_DIRECTORY + fileId.toString());
+
+        try {
+            byte[] fileData = Files.readAllBytes(Paths.get(file.getPath()));
+            return fileData;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void restoreFile(FileId fileId, byte[] fileData) {
+        File file = new File(storageDir + RESTORED_DIRECTORY + fileId.getFileName());
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(fileData);
+            Utils.safePrintln("File " + fileId.getFileName() + " restored successfuly");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
     }
 }

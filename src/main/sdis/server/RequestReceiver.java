@@ -9,8 +9,10 @@ import java.util.concurrent.ExecutorService;
 
 import main.sdis.common.CustomExecutorService;
 import main.sdis.common.Utils;
+import main.sdis.message.GetFileMessage;
 import main.sdis.message.Message;
 import main.sdis.message.PutFileMessage;
+import main.sdis.server.protocol.GetFileHandler;
 import main.sdis.server.protocol.PutFileHandler;
 
 public class RequestReceiver implements Runnable {
@@ -42,6 +44,9 @@ public class RequestReceiver implements Runnable {
                         break;
                     case PUTFILE:
                         executorService.execute(new PutFileHandler(server, (PutFileMessage) message, out));
+                        break;
+                    case GETFILE:
+                        executorService.execute(new GetFileHandler(server, (GetFileMessage) message, out));
                         break;
                 }
                 

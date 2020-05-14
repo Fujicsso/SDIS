@@ -15,6 +15,8 @@ import main.sdis.file.FileId;
 import main.sdis.message.ConnectMessage;
 import main.sdis.message.ConnectedMessage;
 import main.sdis.message.ErrorMessage;
+import main.sdis.message.FileMessage;
+import main.sdis.message.GetFileMessage;
 import main.sdis.message.Message;
 import main.sdis.message.MessageType;
 import main.sdis.message.PutFileMessage;
@@ -80,7 +82,18 @@ public class PeerImpl extends NodeImpl implements Peer {
 
     @Override
     public void restoreFile(String filePath) throws IOException {
-        throw new UnsupportedOperationException("Not implemented yet");
+        FileId fileId = Utils.generateFileIdForFile(filePath);
+
+        GetFileMessage message = new GetFileMessage(address, fileId);
+
+        Message response = messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
+
+        if (response == null)
+            Utils.safePrintln("An unexpected error occured");
+        else if (response.getMessageType() == MessageType.FILE) {
+            byte[] fileData = ((FileMessage) response).getFileData();
+            storage.restoreFile(fileId, fileData);
+        }
     }
 
     @Override
