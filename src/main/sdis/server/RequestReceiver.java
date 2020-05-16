@@ -9,9 +9,11 @@ import java.util.concurrent.ExecutorService;
 
 import main.sdis.common.CustomExecutorService;
 import main.sdis.common.Utils;
+import main.sdis.message.ConnectMessage;
 import main.sdis.message.GetFileMessage;
 import main.sdis.message.Message;
 import main.sdis.message.PutFileMessage;
+import main.sdis.server.protocol.ConnectionHandler;
 import main.sdis.server.protocol.GetFileHandler;
 import main.sdis.server.protocol.PutFileHandler;
 
@@ -40,7 +42,7 @@ public class RequestReceiver implements Runnable {
 
                 switch (message.getMessageType()) {
                     case CONNECT:
-                        executorService.execute(new ConnectionHandler(server, message, out));
+                        executorService.execute(new ConnectionHandler(server, (ConnectMessage) message, out));
                         break;
                     case PUTFILE:
                         executorService.execute(new PutFileHandler(server, (PutFileMessage) message, out));

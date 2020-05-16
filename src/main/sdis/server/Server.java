@@ -1,18 +1,13 @@
 package main.sdis.server;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import main.sdis.common.NodeImpl;
-import main.sdis.common.Utils;
-import main.sdis.file.FileId;
 
 public class Server extends NodeImpl {
     
@@ -38,7 +33,7 @@ public class Server extends NodeImpl {
         connections.remove(connection);
     }
 
-    public List<Connection> getConnections() {
+    public synchronized List<Connection> getConnections() {
         return connections;
     }
 

@@ -1,12 +1,8 @@
 package main.sdis.server;
 
-import java.util.Arrays;
-import java.util.Iterator;
-
-import main.sdis.common.MessageSender;
-import main.sdis.common.Utils;
+import main.sdis.common.CustomExecutorService;
 import main.sdis.message.PingMessage;
-import main.sdis.message.PongMessage;
+import main.sdis.server.protocol.PingSender;
 
 public class ConnectionMonitor implements Runnable {
 
@@ -18,20 +14,10 @@ public class ConnectionMonitor implements Runnable {
 
     @Override
     public void run() {
-        Iterator<Connection> itr = server.getConnections().iterator();
-
-        while (itr.hasNext()) {
-            // TODO: Ping each client in a separate thread
-            Connection connection = itr.next();
-
+        for (Connection connection : server.getConnections()) {
             PingMessage message = new PingMessage(server.getAddress());
 
-            PongMessage response = new MessageSender().<PongMessage>sendMessage(message,
-                    connection.getClientAddress().getAddress(), connection.getClientAddress().getPort());
-
-            if (response == null)
-                itr.remove();
+            CustomExecutorService.getInstance().execute(new PingSender(server, message, connection));
         }
-        Utils.safePrintln("Currently connected clients: " + Arrays.toString(server.getConnections().toArray()));
     }
 }
