@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import main.sdis.common.Utils;
 import main.sdis.file.FileId;
@@ -20,16 +22,21 @@ public class Storage {
     private static final String BACKUP_DIRECTORY = "backup" + File.separatorChar;
     private static final String RESTORED_DIRECTORY = "restore" + File.separatorChar;
     private static final String DATA_DIRECTORY = "data" + File.separatorChar;
-    private static final String SAVED_FILES_FILE = "backed_up_files";
+    private static final String SAVED_FILES_FILE = "saved_up_files";
+    private static final String BACKED_UP_FILES_FILE = "backed_up_files";
 
     private String storageDir;
     private long maxDiskSize;
+    // Files saved by the peer whose backup was requested by other peers
     private List<FileId> savedFiles;
+    // Files whose backup was initiated by the peer and their desired replication degree
+    private Map<FileId, Integer> backedUpFiles;
     
     public Storage(InetSocketAddress peerAddress) {
         maxDiskSize = DEFAULT_DISK_SIZE;
         storageDir = Utils.formatAddress(peerAddress) + File.separatorChar;
         savedFiles = Collections.synchronizedList(new ArrayList<>());
+        backedUpFiles = new ConcurrentHashMap<>();
 
         File backupDir = new File(storageDir + BACKUP_DIRECTORY);
         File restoreDir = new File(storageDir + RESTORED_DIRECTORY);
@@ -39,6 +46,7 @@ public class Storage {
         dataDir.mkdirs();
 
         loadSavedFiles();
+        loadBackedUpFiles();
     }
 
     public void setMaxDiskSize(long maxDiskSize) {
@@ -80,6 +88,27 @@ public class Storage {
         Utils.serializeObject(file, savedFiles);
     }
 
+    private void loadBackedUpFiles() {
+        File file = new File(storageDir + DATA_DIRECTORY + BACKED_UP_FILES_FILE);
+
+        Object deserialized = Utils.deserializeObject(file);
+
+        if (deserialized != null)
+            backedUpFiles = (ConcurrentHashMap<FileId, Integer>) deserialized;
+
+        System.out.println(Arrays.toString(Arrays.asList(backedUpFiles).toArray()));
+    }
+
+    private void saveBackedUpFiles() {
+        File file = new File(storageDir + DATA_DIRECTORY + BACKED_UP_FILES_FILE);
+        Utils.serializeObject(file, backedUpFiles);
+    }
+
+    public void addBackedUpFile(FileId fileId, int replicationDegree) {
+        backedUpFiles.put(fileId, replicationDegree);
+        saveBackedUpFiles();
+    }
+
     public synchronized byte[] getFileData(FileId fileId) {
         File file = new File(storageDir + BACKUP_DIRECTORY + fileId.toString());
 
@@ -111,5 +140,18 @@ public class Storage {
                 ioe.printStackTrace();
             }
         }
+    }
+
+    public void listSavedFiles() {
+        File backupDir = new File(storageDir + BACKUP_DIRECTORY);
+
+        File[] files = backupDir.listFiles();
+
+        for (File file : files)
+            Utils.safePrintln(file.getName() + " | " + Utils.getKbFileSize(file));
+    }
+
+    public Map<FileId, Integer> getBackedUpFiles() {
+        return backedUpFiles;
     }
 }

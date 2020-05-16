@@ -99,4 +99,8 @@ public class Utils {
         else
             return list;
     }
+
+    public static String getKbFileSize(File file) {
+		return (double) file.length() / 1024 + "  kb";
+	}
 }

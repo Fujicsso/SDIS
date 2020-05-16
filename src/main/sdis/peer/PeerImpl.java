@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import main.sdis.common.ConnectionFailedException;
 import main.sdis.common.MessageSender;
@@ -74,8 +75,10 @@ public class PeerImpl extends NodeImpl implements Peer {
 
         if (response == null)
             Utils.safePrintln("An unexpected error occured");
-        else if (response.getMessageType() == MessageType.OK)
+        else if (response.getMessageType() == MessageType.OK) {
+            storage.addBackedUpFile(fileId, replicationDegree);
             Utils.safePrintln("Backup successful");
+        }
         else if (response.getMessageType() == MessageType.ERROR)
             Utils.safePrintln(((ErrorMessage) response).getErrorDetails());
     }
@@ -108,7 +111,13 @@ public class PeerImpl extends NodeImpl implements Peer {
 
     @Override
     public void retrieveState() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Utils.safePrintln("BACKED UP FILES");
+        for (Map.Entry<FileId, Integer> entry: storage.getBackedUpFiles().entrySet()) {
+            Utils.safePrintln(entry.getKey() + " | Rep. degree = " + entry.getValue());
+        }
+        Utils.safePrintln("");
+        Utils.safePrintln("SAVED FILES");
+        storage.listSavedFiles();
     }
 
     public Storage getStorage() {
