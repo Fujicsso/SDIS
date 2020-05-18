@@ -15,6 +15,7 @@ import main.sdis.common.Utils;
 import main.sdis.file.FileId;
 import main.sdis.message.ConnectMessage;
 import main.sdis.message.ConnectedMessage;
+import main.sdis.message.DeleteFileMessage;
 import main.sdis.message.ErrorMessage;
 import main.sdis.message.FileMessage;
 import main.sdis.message.GetFileMessage;
@@ -101,7 +102,18 @@ public class PeerImpl extends NodeImpl implements Peer {
 
     @Override
     public void deleteFile(String filePath) throws IOException {
-        throw new UnsupportedOperationException("Not implemented yet");
+        FileId fileId = Utils.generateFileIdForFile(filePath);
+
+        DeleteFileMessage message = new DeleteFileMessage(address, fileId);
+
+        Message response = messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
+
+        if (response == null)
+            Utils.safePrintln("An unexpected error occured");
+        else if (response.getMessageType() == MessageType.OK)
+            Utils.safePrintln("Delete successful");
+        else if (response.getMessageType() == MessageType.ERROR)
+            Utils.safePrintln(((ErrorMessage) response).getErrorDetails());
     }
 
     @Override
