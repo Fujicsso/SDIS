@@ -29,9 +29,10 @@ public class Storage {
     private long maxDiskSize;
     // Files saved by the peer whose backup was requested by other peers
     private List<FileId> savedFiles;
-    // Files whose backup was initiated by the peer and their desired replication degree
+    // Files whose backup was initiated by the peer and their desired replication
+    // degree
     private Map<FileId, Integer> backedUpFiles;
-    
+
     public Storage(InetSocketAddress peerAddress) {
         maxDiskSize = DEFAULT_DISK_SIZE;
         storageDir = Utils.formatAddress(peerAddress) + File.separatorChar;
@@ -154,4 +155,20 @@ public class Storage {
     public Map<FileId, Integer> getBackedUpFiles() {
         return backedUpFiles;
     }
+
+    public void deleteFile(FileId fileId) {
+        File file = new File(storageDir + BACKUP_DIRECTORY + fileId.toString());
+
+        file.delete();
+
+        removeSavedChunksOfFile(fileId);
+
+    }
+
+    private synchronized void removeSavedChunksOfFile(FileId fileId) {
+        savedFiles.remove(fileId);
+
+        saveSavedFiles();
+    }
+
 }

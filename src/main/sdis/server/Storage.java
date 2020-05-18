@@ -70,4 +70,17 @@ public class Storage {
         File file = new File(DATA_DIRECTORY + BACKED_UP_FILES_FILE);
         Utils.serializeObject(file, backedUpFiles);
     }
+
+    public synchronized void removeBackedUpFile(FileId fileId, InetSocketAddress peerAddress) {
+        List<InetSocketAddress> peers = backedUpFiles.get(fileId);
+
+        if (peers.contains(peerAddress))
+            peers.remove(peerAddress);
+
+        backedUpFiles.put(fileId, peers);
+        
+        saveBackedUpFiles();
+
+        Utils.safePrintln("File: " + fileId + " Rep: " + getFileReplicationDegree(fileId));
+    }
 }
