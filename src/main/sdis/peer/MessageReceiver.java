@@ -6,9 +6,11 @@ import main.sdis.message.GetFileMessage;
 import main.sdis.message.Message;
 import main.sdis.message.PingMessage;
 import main.sdis.message.PutFileMessage;
+import main.sdis.message.DeleteFileMessage;
 import main.sdis.peer.protocol.GetFileHandler;
 import main.sdis.peer.protocol.PingHandler;
 import main.sdis.peer.protocol.PutFileHandler;
+import main.sdis.peer.protocol.DeleteFileHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -50,6 +52,9 @@ public class MessageReceiver implements Runnable {
                         break;
                     case GETFILE:
                         executorService.execute(new GetFileHandler(peer, (GetFileMessage) message, out));
+                        break;
+                    case DELETE:
+                        executorService.execute(new DeleteFileHandler(peer, (DeleteFileMessage) message, out));
                         break;
                 }
             } catch (IOException | ClassNotFoundException e) {
