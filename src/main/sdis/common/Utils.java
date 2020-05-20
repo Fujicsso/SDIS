@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -107,5 +108,14 @@ public class Utils {
     public static String generatePeerDirectory(InetSocketAddress peer){
         String address = formatAddress(peer);
         return address.replace(':', '_');
+    }
+
+    public static <K,V> K findKey(Map<K,V> map, K pseudoKey){
+        for(K key : map.keySet()){
+            if(key.equals(pseudoKey))
+                return key;
+        }
+
+        return null;
     }
 }

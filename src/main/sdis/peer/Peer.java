@@ -13,7 +13,7 @@ public interface Peer extends Remote {
 
     void deleteFile(String filePath) throws IOException;
 
-    void reclaimSpace(long maxDiskSpace) throws RemoteException;
+    void reclaimSpace(long maxDiskSpace) throws RemoteException, IOException;
 
     void retrieveState() throws RemoteException;
 

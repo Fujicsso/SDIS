@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,6 +57,10 @@ public class Storage {
 
     public long getMaxDiskSize() {
         return maxDiskSize;
+    }
+
+    public List<FileId> getSavedFiles() {
+        return savedFiles;
     }
 
     public synchronized void saveFile(FileId fileId, byte[] fileData) {
@@ -158,9 +163,8 @@ public class Storage {
 
     public void deleteFile(FileId fileId) {
         File file = new File(storageDir + BACKUP_DIRECTORY + fileId.toString());
-        Utils.safePrintln(file.exists());
-        Utils.safePrintln(storageDir + BACKUP_DIRECTORY + fileId.toString());
-        Utils.safePrintln(file.delete());
+        
+        file.delete();
 
         removeSavedChunksOfFile(fileId);
 
@@ -171,5 +175,26 @@ public class Storage {
 
         saveSavedFiles();
     }
+
+	public long getUsedSpace() {
+        long ret = 0;
+        for(FileId id : savedFiles){
+            File file = new File(storageDir + BACKUP_DIRECTORY + id.toString());
+
+            ret += file.length();
+        }
+
+        return ret;
+    } 
+    
+    public synchronized List<File> listSortedSavedFiles() {
+        File backUpDirectory = new File(storageDir + BACKUP_DIRECTORY);
+        List<File> files = Arrays.asList(backUpDirectory.listFiles());
+
+        Collections.sort(files, Comparator.comparingLong(File::length));
+
+        return files;
+    }
+
 
 }

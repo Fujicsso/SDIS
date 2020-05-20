@@ -15,7 +15,8 @@ public class FileId implements Serializable {
     private byte[] hash;
     private String fileName;
 
-    protected FileId() {};
+    protected FileId() {
+    };
 
     public FileId(String fileName, long lastModified, String owner, byte[] fileData) {
         try {
@@ -27,11 +28,16 @@ public class FileId implements Serializable {
         this.fileName = fileName;
     }
 
-    private byte[] generateId(String fileName, long lastModified, String owner, byte[] fileData) throws NoSuchAlgorithmException {
+    public FileId(String base64Hash) {
+        this.hash = Base64.getUrlDecoder().decode(base64Hash);
+    }
+
+    private byte[] generateId(String fileName, long lastModified, String owner, byte[] fileData)
+            throws NoSuchAlgorithmException {
         String lastModifiedStr = Long.toString(lastModified);
 
-        byte[] fileIdBytes = new byte[fileName.getBytes().length + Long.toString(lastModified).getBytes().length 
-            + owner.getBytes().length + fileData.length];
+        byte[] fileIdBytes = new byte[fileName.getBytes().length + Long.toString(lastModified).getBytes().length
+                + owner.getBytes().length + fileData.length];
         ByteBuffer buff = ByteBuffer.wrap(fileIdBytes);
 
         buff.put(fileName.getBytes());
@@ -56,8 +62,10 @@ public class FileId implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (getClass() != obj.getClass())
+            return false;
 
         FileId other = (FileId) obj;
 

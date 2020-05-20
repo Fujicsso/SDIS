@@ -26,11 +26,22 @@ public class PutFileHandler implements Runnable {
     private ObjectOutputStream out;
     private ExecutorService executorService;
     private MessageSender messageSender;
+    private List<InetSocketAddress> blackList;
 
     public PutFileHandler(Server server, PutFileMessage message, ObjectOutputStream out) {
         this.server = server;
         this.message = message;
         this.out = out;
+        this.blackList = new ArrayList<>();
+        executorService = CustomExecutorService.getInstance();
+        messageSender = new MessageSender();
+    }
+
+    public PutFileHandler(Server server, PutFileMessage message, ObjectOutputStream out, List<InetSocketAddress> blackList) {
+        this.server = server;
+        this.message = message;
+        this.out = out;
+        this.blackList = blackList;
         executorService = CustomExecutorService.getInstance();
         messageSender = new MessageSender();
     }
@@ -67,7 +78,8 @@ public class PutFileHandler implements Runnable {
 
             List<Connection> randomConnections = new ArrayList<>(server.getConnections());
             randomConnections.removeIf(conn -> conn.getClientAddress().equals(message.getSenderAddress())
-                    || (peersOfFile != null && peersOfFile.contains(conn.getClientAddress())));
+                    || (peersOfFile != null && peersOfFile.contains(conn.getClientAddress()))
+                    || (blackList.contains(conn.getClientAddress())));
             randomConnections = Utils.randomSubList(randomConnections, message.getReplicationDegree());
 
             for (Connection connection : randomConnections)

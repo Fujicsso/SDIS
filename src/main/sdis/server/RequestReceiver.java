@@ -14,10 +14,12 @@ import main.sdis.message.DeleteFileMessage;
 import main.sdis.message.GetFileMessage;
 import main.sdis.message.Message;
 import main.sdis.message.PutFileMessage;
+import main.sdis.message.RemovedMessage;
 import main.sdis.server.protocol.ConnectionHandler;
 import main.sdis.server.protocol.GetFileHandler;
 import main.sdis.server.protocol.PutFileHandler;
 import main.sdis.server.protocol.DeleteFileHandler;
+import main.sdis.server.protocol.RemovedHandler;
 
 public class RequestReceiver implements Runnable {
 
@@ -55,6 +57,9 @@ public class RequestReceiver implements Runnable {
                         break;
                     case DELETE:
                         executorService.execute(new DeleteFileHandler(server, (DeleteFileMessage) message, out));
+                        break;
+                    case REMOVED:
+                        executorService.execute(new RemovedHandler(server, (RemovedMessage) message, out));
                         break;
                 }
 

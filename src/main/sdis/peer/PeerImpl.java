@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 import main.sdis.common.ConnectionFailedException;
@@ -22,6 +23,7 @@ import main.sdis.message.GetFileMessage;
 import main.sdis.message.Message;
 import main.sdis.message.MessageType;
 import main.sdis.message.PutFileMessage;
+import main.sdis.message.RemovedMessage;
 
 public class PeerImpl extends NodeImpl implements Peer {
 
@@ -79,8 +81,7 @@ public class PeerImpl extends NodeImpl implements Peer {
         else if (response.getMessageType() == MessageType.OK) {
             storage.addBackedUpFile(fileId, replicationDegree);
             Utils.safePrintln("Backup successful");
-        }
-        else if (response.getMessageType() == MessageType.ERROR)
+        } else if (response.getMessageType() == MessageType.ERROR)
             Utils.safePrintln(((ErrorMessage) response).getErrorDetails());
     }
 
@@ -117,14 +118,46 @@ public class PeerImpl extends NodeImpl implements Peer {
     }
 
     @Override
-    public void reclaimSpace(long maxDiskSpace) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void reclaimSpace(long maxDiskSpace) throws IOException {
+        storage.setMaxDiskSize(maxDiskSpace);
+        List<File> storedFiles = storage.listSortedSavedFiles();
+        long usedSpace = storage.getUsedSpace();
+
+        Utils.safePrintf("Used space before reclaim: %dB\n ", usedSpace);
+
+        for (File file : storedFiles) {
+            if (usedSpace > maxDiskSpace) {
+                usedSpace -= file.length();
+
+                Path path = Paths.get(file.getPath());
+
+                byte[] fileBytes = Files.readAllBytes(path);
+                FileId fileId = new FileId(file.getName());
+                storage.deleteFile(fileId);
+
+                RemovedMessage removedMessage = new RemovedMessage(address,
+                        fileId,fileBytes);
+
+                Message response = messageSender.sendMessage(removedMessage, serverAddress.getAddress(),
+                        serverAddress.getPort());
+
+                if (response == null)
+                    Utils.safePrintf("An unexpected error occured");
+                else if (response.getMessageType() == MessageType.OK)
+                    Utils.safePrintf("Reclaimed %dKB", file.length() / 1000);
+                else if (response.getMessageType() == MessageType.ERROR)
+                    Utils.safePrintf(((ErrorMessage) response).getErrorDetails());
+            }
+        }
+
+        Utils.safePrintf("Used space after reclaim: %dB\n ", usedSpace);
+
     }
 
     @Override
     public void retrieveState() {
         Utils.safePrintln("BACKED UP FILES");
-        for (Map.Entry<FileId, Integer> entry: storage.getBackedUpFiles().entrySet()) {
+        for (Map.Entry<FileId, Integer> entry : storage.getBackedUpFiles().entrySet()) {
             Utils.safePrintln(entry.getKey() + " | Rep. degree = " + entry.getValue());
         }
         Utils.safePrintln("");

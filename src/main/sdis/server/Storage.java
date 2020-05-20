@@ -14,7 +14,7 @@ import main.sdis.common.Utils;
 import main.sdis.file.FileId;
 
 public class Storage {
-    
+
     private static final String BASE_DIR = "server" + File.separatorChar;
     private static final String DATA_DIRECTORY = BASE_DIR + "data" + File.separatorChar;
     private static final String BACKED_UP_FILES_FILE = "backed_up_files";
@@ -79,11 +79,19 @@ public class Storage {
         if (peers.contains(peerAddress))
             peers.remove(peerAddress);
 
-        backedUpFiles.put(new BackupInfo(fileId), peers);
-        
+        if (peers.isEmpty()) {
+            backedUpFiles.remove(new BackupInfo(fileId));
+        } else {
+            backedUpFiles.put(new BackupInfo(fileId), peers);
+        }
+
         saveBackedUpFiles();
 
         Utils.safePrintln("File: " + fileId + " Rep: " + getFileReplicationDegree(fileId));
 
+    }
+
+    public synchronized int getDesiredRepDegree(FileId fileId){
+        return Utils.findKey(backedUpFiles, new BackupInfo(fileId)).getDesiredRepDegree();
     }
 }
