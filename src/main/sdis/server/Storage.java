@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import main.sdis.common.BackupInfo;
 import main.sdis.common.Utils;
 import main.sdis.file.FileId;
 
@@ -20,7 +21,7 @@ public class Storage {
 
     // Stores all files that have been backed up in the system
     // and the list of peers who saved each file
-    private Map<FileId, List<InetSocketAddress>> backedUpFiles;
+    private Map<BackupInfo, List<InetSocketAddress>> backedUpFiles;
 
     public Storage() {
         File dataDir = new File(DATA_DIRECTORY);
@@ -31,9 +32,10 @@ public class Storage {
         dataDir.mkdirs();
     }
 
-    public synchronized void addBackedUpFile(FileId fileId, InetSocketAddress peerAddress) {
-        List<InetSocketAddress> peers = backedUpFiles.computeIfAbsent(fileId,
-                id -> Collections.synchronizedList(new ArrayList<>()));
+    public synchronized void addBackedUpFile(FileId fileId, int desiredRepDegree, InetSocketAddress peerAddress) {
+        BackupInfo info = new BackupInfo(fileId, desiredRepDegree);
+        List<InetSocketAddress> peers = backedUpFiles.computeIfAbsent(info,
+                i -> Collections.synchronizedList(new ArrayList<>()));
 
         if (!peers.contains(peerAddress))
             peers.add(peerAddress);
@@ -44,15 +46,15 @@ public class Storage {
     }
 
     public synchronized boolean hasBackedUpFile(FileId fileId) {
-        return backedUpFiles.containsKey(fileId);
+        return backedUpFiles.containsKey(new BackupInfo(fileId));
     }
 
     public synchronized List<InetSocketAddress> getPeersOfBackedUpFile(FileId fileId) {
-        return backedUpFiles.get(fileId);
+        return backedUpFiles.get(new BackupInfo(fileId));
     }
 
     public synchronized int getFileReplicationDegree(FileId fileId) {
-        return backedUpFiles.get(fileId).size();
+        return backedUpFiles.get(new BackupInfo(fileId)).size();
     }
 
     private void loadBackedUpFiles() {
@@ -61,7 +63,7 @@ public class Storage {
         Object deserialized = Utils.deserializeObject(file);
 
         if (deserialized != null)
-            backedUpFiles = (ConcurrentHashMap<FileId, List<InetSocketAddress>>) deserialized;
+            backedUpFiles = (ConcurrentHashMap<BackupInfo, List<InetSocketAddress>>) deserialized;
 
         System.out.println(Arrays.asList(backedUpFiles));
     }
@@ -72,15 +74,16 @@ public class Storage {
     }
 
     public synchronized void removeBackedUpFile(FileId fileId, InetSocketAddress peerAddress) {
-        List<InetSocketAddress> peers = backedUpFiles.get(fileId);
+        List<InetSocketAddress> peers = backedUpFiles.get(new BackupInfo(fileId));
 
         if (peers.contains(peerAddress))
             peers.remove(peerAddress);
 
-        backedUpFiles.put(fileId, peers);
+        backedUpFiles.put(new BackupInfo(fileId), peers);
         
         saveBackedUpFiles();
 
         Utils.safePrintln("File: " + fileId + " Rep: " + getFileReplicationDegree(fileId));
+
     }
 }

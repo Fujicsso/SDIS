@@ -81,7 +81,7 @@ public class PutFileHandler implements Runnable {
 
                     Utils.safePrintln("STORED MESSAGE: " + storedMessage.toString());
 
-                    server.getStorage().addBackedUpFile(message.getFileId(), storedMessage.getSenderAddress());
+                    server.getStorage().addBackedUpFile(message.getFileId(), message.getReplicationDegree(), storedMessage.getSenderAddress());
                 }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
