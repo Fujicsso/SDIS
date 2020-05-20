@@ -35,7 +35,7 @@ public class Storage {
 
     public Storage(InetSocketAddress peerAddress) {
         maxDiskSize = DEFAULT_DISK_SIZE;
-        storageDir = Utils.formatAddress(peerAddress) + File.separatorChar;
+        storageDir = Utils.generatePeerDirectory(peerAddress) + File.separatorChar;
         savedFiles = Collections.synchronizedList(new ArrayList<>());
         backedUpFiles = new ConcurrentHashMap<>();
 
@@ -158,8 +158,9 @@ public class Storage {
 
     public void deleteFile(FileId fileId) {
         File file = new File(storageDir + BACKUP_DIRECTORY + fileId.toString());
-
-        file.delete();
+        Utils.safePrintln(file.exists());
+        Utils.safePrintln(storageDir + BACKUP_DIRECTORY + fileId.toString());
+        Utils.safePrintln(file.delete());
 
         removeSavedChunksOfFile(fileId);
 

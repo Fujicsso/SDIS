@@ -102,5 +102,10 @@ public class Utils {
 
     public static String getKbFileSize(File file) {
 		return (double) file.length() / 1024 + "  kb";
-	}
+    }
+    
+    public static String generatePeerDirectory(InetSocketAddress peer){
+        String address = formatAddress(peer);
+        return address.replace(':', '_');
+    }
 }
