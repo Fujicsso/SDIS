@@ -10,7 +10,7 @@ public class GetFileMessage extends Message {
     private FileId fileId;
 
     public GetFileMessage(InetSocketAddress senderAddress, FileId fileId) {
-        super(MessageType.GETFILE, senderAddress, true);
+        super(MessageType.GETFILE, senderAddress);
         this.fileId = fileId;
     }
 

@@ -10,7 +10,7 @@ public class GetDeletePeersMessage extends Message {
     public FileId fileId;
 
     public GetDeletePeersMessage(InetSocketAddress senderAddress, FileId fileId) {
-        super(MessageType.GETDELETEPEERS, senderAddress, false);
+        super(MessageType.GETDELETEPEERS, senderAddress);
         this.fileId = fileId;
     }
 

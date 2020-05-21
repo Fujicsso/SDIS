@@ -12,7 +12,7 @@ public class ConfirmDeleteMessage extends Message {
     private InetSocketAddress deletePeer;
 
     public ConfirmDeleteMessage(InetSocketAddress senderAddress, FileId fileId, InetSocketAddress deletePeer) {
-        super(MessageType.CONFIRMDELETE, senderAddress, false);
+        super(MessageType.CONFIRMDELETE, senderAddress);
         this.fileId = fileId;
         this.deletePeer = deletePeer;
     }

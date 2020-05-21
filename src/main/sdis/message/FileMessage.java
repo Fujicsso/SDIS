@@ -11,7 +11,7 @@ public class FileMessage extends Message {
     private byte[] fileData;
 
     public FileMessage(InetSocketAddress senderAddress, FileId fileId, byte[] fileData) {
-        super(MessageType.FILE, senderAddress, true);
+        super(MessageType.FILE, senderAddress);
         this.fileId = fileId;
         this.fileData = fileData;
     }

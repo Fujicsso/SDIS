@@ -10,14 +10,12 @@ public abstract class Message implements Serializable {
 
     protected MessageType messageType;
     protected InetSocketAddress senderAddress;
-    protected boolean isBroadcastable;
 
     protected Message() {}
 
-    public Message(MessageType messageType, InetSocketAddress senderAddress, boolean isBroadcastable) {
+    public Message(MessageType messageType, InetSocketAddress senderAddress) {
         this.messageType = messageType;
         this.senderAddress = senderAddress;
-        this.isBroadcastable = false;
     }
 
     public MessageType getMessageType() {
@@ -26,10 +24,6 @@ public abstract class Message implements Serializable {
 
     public InetSocketAddress getSenderAddress() {
         return senderAddress;
-    }
-
-    public boolean isBroadcastable() {
-        return isBroadcastable;
     }
 
     @Override

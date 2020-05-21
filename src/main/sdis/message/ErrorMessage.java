@@ -8,7 +8,7 @@ public class ErrorMessage extends Message {
     private String errorDetails;
 
     public ErrorMessage(InetSocketAddress senderAddress, String errorDetails) {
-        super(MessageType.ERROR, senderAddress, false);
+        super(MessageType.ERROR, senderAddress);
         this.errorDetails = errorDetails;
     }
 

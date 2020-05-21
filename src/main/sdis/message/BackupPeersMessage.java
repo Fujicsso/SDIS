@@ -9,7 +9,7 @@ public class BackupPeersMessage extends Message {
     List<InetSocketAddress> backupPeers;
     
     public BackupPeersMessage(InetSocketAddress senderAddress, List<InetSocketAddress> backupPeers) {
-        super(MessageType.BACKUPPEERS, senderAddress, false);
+        super(MessageType.BACKUPPEERS, senderAddress);
         this.backupPeers = backupPeers;
     }
 

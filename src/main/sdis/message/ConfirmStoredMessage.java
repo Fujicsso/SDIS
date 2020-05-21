@@ -14,7 +14,7 @@ public class ConfirmStoredMessage extends Message {
 
     public ConfirmStoredMessage(InetSocketAddress senderAddress, FileId fileId, InetSocketAddress storedPeer,
             int desiredRepDegree) {
-        super(MessageType.CONFIRMSTORED, senderAddress, false);
+        super(MessageType.CONFIRMSTORED, senderAddress);
         this.fileId = fileId;
         this.storedPeer = storedPeer;
         this.desiredRepDegree = desiredRepDegree;

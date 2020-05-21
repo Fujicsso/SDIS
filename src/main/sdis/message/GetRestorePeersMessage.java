@@ -10,7 +10,7 @@ public class GetRestorePeersMessage extends Message {
     private FileId fileId;
     
     public GetRestorePeersMessage(InetSocketAddress senderAddress, FileId fileId) {
-        super(MessageType.GETRESTOREPEERS, senderAddress, false);
+        super(MessageType.GETRESTOREPEERS, senderAddress);
         this.fileId = fileId;
     }
 

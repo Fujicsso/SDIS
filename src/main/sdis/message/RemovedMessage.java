@@ -11,7 +11,7 @@ public class RemovedMessage extends Message {
     private byte[] fileData;
 
     public RemovedMessage(InetSocketAddress senderAddress, FileId fileId, byte[] fileData) {
-        super(MessageType.REMOVED, senderAddress, true);
+        super(MessageType.REMOVED, senderAddress);
         this.fileId = fileId;
         this.fileData = fileData;
     }

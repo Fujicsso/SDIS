@@ -9,7 +9,7 @@ public class ReclaimPeersMessage extends Message {
     private List<InetSocketAddress> reclaimPeers;
 
     public ReclaimPeersMessage(InetSocketAddress senderAddress, List<InetSocketAddress> reclaimPeers) {
-        super(MessageType.RECLAIMPEERS, senderAddress, false);
+        super(MessageType.RECLAIMPEERS, senderAddress);
         this.reclaimPeers = reclaimPeers;
     }
 

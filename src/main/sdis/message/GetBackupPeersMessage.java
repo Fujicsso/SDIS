@@ -11,7 +11,7 @@ public class GetBackupPeersMessage extends Message {
     private int replicationDegree;
     
     public GetBackupPeersMessage(InetSocketAddress senderAddress, FileId fileId, int replicationDegree) {
-        super(MessageType.GETBACKUPPEERS, senderAddress, false);
+        super(MessageType.GETBACKUPPEERS, senderAddress);
         this.fileId = fileId;
         this.replicationDegree = replicationDegree;
     }

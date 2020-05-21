@@ -9,7 +9,7 @@ public class DeletePeersMessage extends Message {
     private List<InetSocketAddress> deletePeers;
 
     public DeletePeersMessage(InetSocketAddress senderAddress, List<InetSocketAddress> deletePeers) {
-        super(MessageType.DELETEPEERS, senderAddress, false);
+        super(MessageType.DELETEPEERS, senderAddress);
         this.deletePeers = deletePeers;
     }
 

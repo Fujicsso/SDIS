@@ -9,7 +9,7 @@ public class RestorePeersMessage extends Message {
     List<InetSocketAddress> restorePeers;
     
     public RestorePeersMessage(InetSocketAddress senderAddress, List<InetSocketAddress> restorePeers) {
-        super(MessageType.RESTOREPEERS, senderAddress, false);
+        super(MessageType.RESTOREPEERS, senderAddress);
         this.restorePeers = restorePeers;
     }
 

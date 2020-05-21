@@ -10,7 +10,7 @@ public class DeleteMessage extends Message {
     private FileId fileId;
 
     public DeleteMessage(InetSocketAddress senderAddress, FileId fileId) {
-        super(MessageType.DELETE, senderAddress, true);
+        super(MessageType.DELETE, senderAddress);
         this.fileId = fileId;
     }
 
