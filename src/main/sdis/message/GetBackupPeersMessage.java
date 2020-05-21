@@ -23,4 +23,9 @@ public class GetBackupPeersMessage extends Message {
     public int getReplicationDegree() {
         return replicationDegree;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + fileId + " " + replicationDegree;
+    }
 }

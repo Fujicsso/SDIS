@@ -24,4 +24,9 @@ public class ConfirmDeleteMessage extends Message {
     public InetSocketAddress getDeletePeer() {
         return deletePeer;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + deletePeer.toString();
+    }
 }

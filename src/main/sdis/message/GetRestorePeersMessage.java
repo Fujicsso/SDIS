@@ -17,4 +17,9 @@ public class GetRestorePeersMessage extends Message {
     public FileId getFileId() {
         return fileId;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + fileId;
+    }
 }

@@ -23,4 +23,9 @@ public class FileMessage extends Message {
     public byte[] getFileData() {
         return fileData;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + fileId;
+    }
 }

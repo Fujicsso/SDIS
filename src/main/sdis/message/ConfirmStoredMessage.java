@@ -31,4 +31,9 @@ public class ConfirmStoredMessage extends Message {
     public int getDesiredRepDegree() {
         return desiredRepDegree;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + fileId + " " + storedPeer + " " + desiredRepDegree;
+    }
 }

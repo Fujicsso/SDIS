@@ -2,7 +2,6 @@ package main.sdis.message;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
-import java.util.StringJoiner;
 
 public abstract class Message implements Serializable {
 
@@ -28,11 +27,6 @@ public abstract class Message implements Serializable {
 
     @Override
     public String toString() {
-        StringJoiner sj = new StringJoiner(" ");
-
-        sj.add(messageType.toString())
-            .add(senderAddress.toString());
-
-        return sj.toString();
+        return messageType.toString();
     }
 }

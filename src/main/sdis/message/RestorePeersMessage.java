@@ -1,6 +1,7 @@
 package main.sdis.message;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.List;
 
 public class RestorePeersMessage extends Message {
@@ -15,5 +16,10 @@ public class RestorePeersMessage extends Message {
 
     public List<InetSocketAddress> getRestorePeers() {
         return restorePeers;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + Arrays.toString(restorePeers.toArray());
     }
 }

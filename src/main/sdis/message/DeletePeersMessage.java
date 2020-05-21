@@ -1,6 +1,7 @@
 package main.sdis.message;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.List;
 
 public class DeletePeersMessage extends Message {
@@ -15,5 +16,10 @@ public class DeletePeersMessage extends Message {
 
     public List<InetSocketAddress> getDeletePeers() {
         return deletePeers;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + Arrays.toString(deletePeers.toArray());
     }
 }
