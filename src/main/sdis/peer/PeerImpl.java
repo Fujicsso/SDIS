@@ -100,13 +100,9 @@ public class PeerImpl extends NodeImpl implements Peer {
     public void deleteFile(String filePath) throws IOException {
         FileId fileId = Utils.generateFileIdForFile(filePath);
 
-        GetDeletePeersMessage getDeletePeersMessage = new GetDeletePeersMessage(address, fileId);
-        DeletePeersMessage getDeletePeersResponse = messageSender.sendMessage(getDeletePeersMessage,
-                serverAddress.getAddress(), serverAddress.getPort());
-
         DeleteMessage deleteMessage = new DeleteMessage(address, fileId);
 
-        executorService.execute(new Delete(this, deleteMessage, getDeletePeersResponse.getDeletePeers()));
+        executorService.execute(new Delete(this, deleteMessage));
     }
 
     @Override

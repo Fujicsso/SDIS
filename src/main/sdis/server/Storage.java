@@ -50,10 +50,17 @@ public class Storage {
     }
 
     public synchronized List<InetSocketAddress> getPeersOfBackedUpFile(FileId fileId) {
-        return backedUpFiles.get(new BackupInfo(fileId));
+        List<InetSocketAddress> peers = backedUpFiles.get(new BackupInfo(fileId));
+
+        if (peers == null)
+            return new ArrayList<>();
+        else
+            return peers;
     }
 
     public synchronized int getFileReplicationDegree(FileId fileId) {
+        if (!backedUpFiles.containsKey(new BackupInfo(fileId))) return 0;
+        
         return backedUpFiles.get(new BackupInfo(fileId)).size();
     }
 

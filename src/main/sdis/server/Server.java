@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import main.sdis.common.NodeImpl;
 import main.sdis.common.Utils;
-import main.sdis.file.FileId;
 import main.sdis.message.GetBackupPeersMessage;
 import main.sdis.message.GetDeletePeersMessage;
 import main.sdis.message.GetRestorePeersMessage;

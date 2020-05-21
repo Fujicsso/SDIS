@@ -86,8 +86,14 @@ public class Backup implements Runnable {
             // Check if desired replication degree has been reached
             if (currRepDegree >= message.getReplicationDegree())
                 reachedDesiredRepDegree = true;
-            else
+            else {
                 Utils.safePrintln("Could not reach desired replication degree. Retrying...");
+                try {
+                    TimeUnit.SECONDS.sleep(WAIT_TIME);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
 
             attempts++;
         }
