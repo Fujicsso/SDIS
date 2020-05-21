@@ -1,18 +1,18 @@
-package main.sdis.server.protocol;
+package main.sdis.peer.protocol;
 
 import java.util.concurrent.Callable;
 
 import main.sdis.common.MessageSender;
-import main.sdis.message.DeleteFileMessage;
+import main.sdis.message.DeleteMessage;
 import main.sdis.message.OkMessage;
 import main.sdis.server.Connection;
 
 public class DeleteFileSender implements Callable<OkMessage> {
 
-    private DeleteFileMessage message;
+    private DeleteMessage message;
     private Connection connection;
 
-    public DeleteFileSender(DeleteFileMessage message, Connection connection) {
+    public DeleteFileSender(DeleteMessage message, Connection connection) {
         this.message = message;
         this.connection = connection;
     }

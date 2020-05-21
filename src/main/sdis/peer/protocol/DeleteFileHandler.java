@@ -3,13 +3,13 @@ package main.sdis.peer.protocol;
 import java.io.ObjectOutputStream;
 
 import main.sdis.common.Handler;
-import main.sdis.message.DeleteFileMessage;
+import main.sdis.message.DeleteMessage;
 import main.sdis.message.OkMessage;
 import main.sdis.peer.PeerImpl;
 
-public class DeleteFileHandler extends Handler<PeerImpl, DeleteFileMessage> implements Runnable {
+public class DeleteFileHandler extends Handler<PeerImpl, DeleteMessage> implements Runnable {
     
-    public DeleteFileHandler(PeerImpl peer, DeleteFileMessage message, ObjectOutputStream out) {
+    public DeleteFileHandler(PeerImpl peer, DeleteMessage message, ObjectOutputStream out) {
         super(peer, message, out);
     }
 

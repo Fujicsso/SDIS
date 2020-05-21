@@ -6,7 +6,7 @@ import main.sdis.message.GetFileMessage;
 import main.sdis.message.Message;
 import main.sdis.message.PingMessage;
 import main.sdis.message.PutFileMessage;
-import main.sdis.message.DeleteFileMessage;
+import main.sdis.message.DeleteMessage;
 import main.sdis.peer.protocol.GetFileHandler;
 import main.sdis.peer.protocol.PingHandler;
 import main.sdis.peer.protocol.PutFileHandler;
@@ -54,7 +54,9 @@ public class MessageReceiver implements Runnable {
                         executorService.execute(new GetFileHandler(peer, (GetFileMessage) message, out));
                         break;
                     case DELETE:
-                        executorService.execute(new DeleteFileHandler(peer, (DeleteFileMessage) message, out));
+                        executorService.execute(new DeleteFileHandler(peer, (DeleteMessage) message, out));
+                        break;
+                    default:
                         break;
                 }
             } catch (IOException | ClassNotFoundException e) {

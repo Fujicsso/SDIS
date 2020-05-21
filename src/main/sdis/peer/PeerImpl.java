@@ -14,16 +14,25 @@ import main.sdis.common.MessageSender;
 import main.sdis.common.NodeImpl;
 import main.sdis.common.Utils;
 import main.sdis.file.FileId;
+import main.sdis.message.BackupPeersMessage;
 import main.sdis.message.ConnectMessage;
 import main.sdis.message.ConnectedMessage;
-import main.sdis.message.DeleteFileMessage;
+import main.sdis.message.DeleteMessage;
+import main.sdis.message.DeletePeersMessage;
 import main.sdis.message.ErrorMessage;
 import main.sdis.message.FileMessage;
+import main.sdis.message.GetBackupPeersMessage;
+import main.sdis.message.GetDeletePeersMessage;
 import main.sdis.message.GetFileMessage;
+import main.sdis.message.GetRestorePeersMessage;
 import main.sdis.message.Message;
 import main.sdis.message.MessageType;
 import main.sdis.message.PutFileMessage;
 import main.sdis.message.RemovedMessage;
+import main.sdis.message.RestorePeersMessage;
+import main.sdis.peer.protocol.Backup;
+import main.sdis.peer.protocol.Delete;
+import main.sdis.peer.protocol.Restore;
 
 public class PeerImpl extends NodeImpl implements Peer {
 
@@ -72,49 +81,35 @@ public class PeerImpl extends NodeImpl implements Peer {
 
         FileId fileId = new FileId(file.getName(), lastModified, owner, fileBytes);
 
-        PutFileMessage message = new PutFileMessage(address, fileId, fileBytes, replicationDegree);
+        PutFileMessage putFileMessage = new PutFileMessage(address, fileId, fileBytes, replicationDegree);
 
-        Message response = messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
-
-        if (response == null)
-            Utils.safePrintln("An unexpected error occured");
-        else if (response.getMessageType() == MessageType.OK) {
-            storage.addBackedUpFile(fileId, replicationDegree);
-            Utils.safePrintln("Backup successful");
-        } else if (response.getMessageType() == MessageType.ERROR)
-            Utils.safePrintln(((ErrorMessage) response).getErrorDetails());
+        executorService.execute(new Backup(this, putFileMessage));
     }
 
     @Override
     public void restoreFile(String filePath) throws IOException {
         FileId fileId = Utils.generateFileIdForFile(filePath);
 
-        GetFileMessage message = new GetFileMessage(address, fileId);
+        GetRestorePeersMessage getRestorePeersMessage = new GetRestorePeersMessage(address, fileId);
+        RestorePeersMessage getRestorePeersResponse = messageSender.sendMessage(getRestorePeersMessage,
+                serverAddress.getAddress(), serverAddress.getPort());
 
-        Message response = messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
+        GetFileMessage getFileMessage = new GetFileMessage(address, fileId);
 
-        if (response == null)
-            Utils.safePrintln("An unexpected error occured");
-        else if (response.getMessageType() == MessageType.FILE) {
-            byte[] fileData = ((FileMessage) response).getFileData();
-            storage.restoreFile(fileId, fileData);
-        }
+        executorService.execute(new Restore(this, getFileMessage, getRestorePeersResponse.getRestorePeers()));
     }
 
     @Override
     public void deleteFile(String filePath) throws IOException {
         FileId fileId = Utils.generateFileIdForFile(filePath);
 
-        DeleteFileMessage message = new DeleteFileMessage(address, fileId);
+        GetDeletePeersMessage getDeletePeersMessage = new GetDeletePeersMessage(address, fileId);
+        DeletePeersMessage getDeletePeersResponse = messageSender.sendMessage(getDeletePeersMessage,
+                serverAddress.getAddress(), serverAddress.getPort());
 
-        Message response = messageSender.sendMessage(message, serverAddress.getAddress(), serverAddress.getPort());
+        DeleteMessage deleteMessage = new DeleteMessage(address, fileId);
 
-        if (response == null)
-            Utils.safePrintln("An unexpected error occured");
-        else if (response.getMessageType() == MessageType.OK)
-            Utils.safePrintln("Delete successful");
-        else if (response.getMessageType() == MessageType.ERROR)
-            Utils.safePrintln(((ErrorMessage) response).getErrorDetails());
+        executorService.execute(new Delete(this, deleteMessage, getDeletePeersResponse.getDeletePeers()));
     }
 
     @Override
@@ -135,8 +130,7 @@ public class PeerImpl extends NodeImpl implements Peer {
                 FileId fileId = new FileId(file.getName());
                 storage.deleteFile(fileId);
 
-                RemovedMessage removedMessage = new RemovedMessage(address,
-                        fileId,fileBytes);
+                RemovedMessage removedMessage = new RemovedMessage(address, fileId, fileBytes);
 
                 Message response = messageSender.sendMessage(removedMessage, serverAddress.getAddress(),
                         serverAddress.getPort());
@@ -167,5 +161,9 @@ public class PeerImpl extends NodeImpl implements Peer {
 
     public Storage getStorage() {
         return storage;
+    }
+
+    public InetSocketAddress getServerAddress() {
+        return serverAddress;
     }
 }

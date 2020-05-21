@@ -12,5 +12,15 @@ public enum MessageType {
     PING,       // Used to check if a given node is up
     PONG,       // Reply to PING message
     OK,         // Used as reply when operation is successful
-    ERROR       // Used as a reply when operation returns an error
+    ERROR,      // Used as a reply when operation returns an error
+    GETBACKUPPEERS,
+    GETRESTOREPEERS,
+    GETDELETEPEERS,
+    GETRECLAIMPEERS,
+    BACKUPPEERS,
+    RESTOREPEERS,
+    DELETEPEERS,
+    RECLAIMPEERS,
+    CONFIRMSTORED,
+    CONFIRMDELETE,
 }

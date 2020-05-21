@@ -9,17 +9,21 @@ import java.util.concurrent.ExecutorService;
 
 import main.sdis.common.CustomExecutorService;
 import main.sdis.common.Utils;
+import main.sdis.message.ConfirmDeleteMessage;
+import main.sdis.message.ConfirmStoredMessage;
 import main.sdis.message.ConnectMessage;
-import main.sdis.message.DeleteFileMessage;
-import main.sdis.message.GetFileMessage;
+import main.sdis.message.GetBackupPeersMessage;
+import main.sdis.message.GetDeletePeersMessage;
+import main.sdis.message.GetReclaimPeersMessage;
+import main.sdis.message.GetRestorePeersMessage;
 import main.sdis.message.Message;
-import main.sdis.message.PutFileMessage;
-import main.sdis.message.RemovedMessage;
+import main.sdis.server.protocol.ConfirmDeleteHandler;
+import main.sdis.server.protocol.ConfirmStoredHandler;
 import main.sdis.server.protocol.ConnectionHandler;
-import main.sdis.server.protocol.GetFileHandler;
-import main.sdis.server.protocol.PutFileHandler;
-import main.sdis.server.protocol.DeleteFileHandler;
-import main.sdis.server.protocol.RemovedHandler;
+import main.sdis.server.protocol.GetReclaimPeersHandler;
+import main.sdis.server.protocol.GetRestorePeersHandler;
+import main.sdis.server.protocol.GetBackupPeersHandler;
+import main.sdis.server.protocol.GetDeletePeersHandler;
 
 public class RequestReceiver implements Runnable {
 
@@ -49,20 +53,27 @@ public class RequestReceiver implements Runnable {
                     case CONNECT:
                         executorService.execute(new ConnectionHandler(server, (ConnectMessage) message, out));
                         break;
-                    case PUTFILE:
-                        executorService.execute(new PutFileHandler(server, (PutFileMessage) message, out));
+                    case GETBACKUPPEERS:
+                        executorService.execute(new GetBackupPeersHandler(server, (GetBackupPeersMessage) message, out));
                         break;
-                    case GETFILE:
-                        executorService.execute(new GetFileHandler(server, (GetFileMessage) message, out));
+                    case GETDELETEPEERS:
+                        executorService.execute(new GetDeletePeersHandler(server, (GetDeletePeersMessage) message, out));
                         break;
-                    case DELETE:
-                        executorService.execute(new DeleteFileHandler(server, (DeleteFileMessage) message, out));
+                    case GETRESTOREPEERS:
+                        executorService.execute(new GetRestorePeersHandler(server, (GetRestorePeersMessage) message, out));
                         break;
-                    case REMOVED:
-                        executorService.execute(new RemovedHandler(server, (RemovedMessage) message, out));
+                    case GETRECLAIMPEERS:
+                        executorService.execute(new GetReclaimPeersHandler(server, (GetReclaimPeersMessage) message, out));
+                        break;
+                    case CONFIRMSTORED:
+                        executorService.execute(new ConfirmStoredHandler(server, (ConfirmStoredMessage) message, out));
+                        break;
+                    case CONFIRMDELETE:
+                        executorService.execute(new ConfirmDeleteHandler(server, (ConfirmDeleteMessage) message, out));
+                        break;
+                    default:
                         break;
                 }
-
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }

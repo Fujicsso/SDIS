@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import main.sdis.common.NodeImpl;
+import main.sdis.common.Utils;
+import main.sdis.file.FileId;
+import main.sdis.message.GetBackupPeersMessage;
+import main.sdis.message.GetDeletePeersMessage;
+import main.sdis.message.GetRestorePeersMessage;
 
 public class Server extends NodeImpl {
     
@@ -39,5 +44,41 @@ public class Server extends NodeImpl {
 
     public Storage getStorage() {
         return storage;
+    }
+
+    public synchronized List<InetSocketAddress> getBackupPeers(GetBackupPeersMessage message) {
+        List<InetSocketAddress> peersOfFile = storage.getPeersOfBackedUpFile(message.getFileId());
+
+        List<Connection> randomConnections = new ArrayList<>(connections);
+            randomConnections.removeIf(conn -> conn.getClientAddress().equals(message.getSenderAddress())
+                    || (peersOfFile != null && peersOfFile.contains(conn.getClientAddress())));
+            randomConnections = Utils.randomSubList(randomConnections, message.getReplicationDegree());
+
+        return getConnectionAddresses(randomConnections);
+    }
+
+    public synchronized List<InetSocketAddress> getRestorePeers(GetRestorePeersMessage message) {
+        List<InetSocketAddress> peers = new ArrayList<>(storage.getPeersOfBackedUpFile(message.getFileId()));
+        Collections.shuffle(peers);
+
+        return peers;
+    }
+
+    public synchronized List<InetSocketAddress> getDeletePeers(GetDeletePeersMessage message) {
+        return storage.getPeersOfBackedUpFile(message.getFileId());
+    }
+
+    public synchronized List<InetSocketAddress> getReclaimPeers() {
+        return getConnectionAddresses(connections);
+    }
+
+    private List<InetSocketAddress> getConnectionAddresses(List<Connection> connections) {
+        List<InetSocketAddress> addresses = new ArrayList<>();
+
+        for (Connection conn : connections) {
+            addresses.add(conn.getClientAddress());
+        }
+
+        return addresses;
     }
 }

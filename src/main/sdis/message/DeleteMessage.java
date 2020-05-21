@@ -4,12 +4,12 @@ import java.net.InetSocketAddress;
 
 import main.sdis.file.FileId;
 
-public class DeleteFileMessage extends Message {
+public class DeleteMessage extends Message {
 
     private static final long serialVersionUID = -7784783834003614281L;
     private FileId fileId;
 
-    public DeleteFileMessage(InetSocketAddress senderAddress, FileId fileId) {
+    public DeleteMessage(InetSocketAddress senderAddress, FileId fileId) {
         super(MessageType.DELETE, senderAddress, true);
         this.fileId = fileId;
     }
