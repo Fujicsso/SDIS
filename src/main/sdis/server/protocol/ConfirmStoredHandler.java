@@ -15,7 +15,7 @@ public class ConfirmStoredHandler extends Handler<Server, ConfirmStoredMessage> 
 
     @Override
     public void run() {
-        node.getStorage().addBackedUpFile(message.getFileId(), message.getDesiredRepDegree(), message.getStoredPeer());
+        node.getStorage().addBackedUpFile(message.getFileId(), message.getDesiredRepDegree(), message.getStoredPeer(), message.getSenderAddress());
 
         OkMessage response = new OkMessage(node.getAddress());
         messageSender.reply(out, response);

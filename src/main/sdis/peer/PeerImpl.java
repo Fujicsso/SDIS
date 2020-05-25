@@ -21,14 +21,17 @@ import main.sdis.message.DeletePeersMessage;
 import main.sdis.message.ErrorMessage;
 import main.sdis.message.GetDeletePeersMessage;
 import main.sdis.message.GetFileMessage;
+import main.sdis.message.GetReclaimPeersMessage;
 import main.sdis.message.GetRestorePeersMessage;
 import main.sdis.message.Message;
 import main.sdis.message.MessageType;
 import main.sdis.message.PutFileMessage;
+import main.sdis.message.ReclaimPeersMessage;
 import main.sdis.message.RemovedMessage;
 import main.sdis.message.RestorePeersMessage;
 import main.sdis.peer.protocol.Backup;
 import main.sdis.peer.protocol.Delete;
+import main.sdis.peer.protocol.Reclaim;
 import main.sdis.peer.protocol.Restore;
 
 public class PeerImpl extends NodeImpl implements Peer {
@@ -118,22 +121,20 @@ public class PeerImpl extends NodeImpl implements Peer {
                 usedSpace -= file.length();
 
                 Path path = Paths.get(file.getPath());
-
+                
                 byte[] fileBytes = Files.readAllBytes(path);
                 FileId fileId = new FileId(file.getName());
+                Map<FileId, Integer> mapa = storage.getSavedFiles();
+                int desiredRepDegree = mapa.get(fileId);
                 storage.deleteFile(fileId);
 
-                RemovedMessage removedMessage = new RemovedMessage(address, fileId, fileBytes);
+                GetReclaimPeersMessage grpMessage =new GetReclaimPeersMessage(address,fileId);
+                ReclaimPeersMessage getReclaimPeersResponse = messageSender.sendMessage(grpMessage,
+                serverAddress.getAddress(), serverAddress.getPort());
 
-                Message response = messageSender.sendMessage(removedMessage, serverAddress.getAddress(),
-                        serverAddress.getPort());
+                PutFileMessage putFileMessage = new PutFileMessage(address, fileId, fileBytes,desiredRepDegree);
 
-                if (response == null)
-                    Utils.safePrintf("An unexpected error occured");
-                else if (response.getMessageType() == MessageType.OK)
-                    Utils.safePrintf("Reclaimed %dKB", file.length() / 1000);
-                else if (response.getMessageType() == MessageType.ERROR)
-                    Utils.safePrintf(((ErrorMessage) response).getErrorDetails());
+                executorService.execute(new Reclaim(this, putFileMessage, getReclaimPeersResponse.getReclaimPeers()));
             }
         }
 

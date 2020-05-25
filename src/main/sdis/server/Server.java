@@ -5,12 +5,15 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import main.sdis.common.BackupInfo;
 import main.sdis.common.NodeImpl;
 import main.sdis.common.Utils;
 import main.sdis.message.GetBackupPeersMessage;
 import main.sdis.message.GetDeletePeersMessage;
+import main.sdis.message.GetReclaimPeersMessage;
 import main.sdis.message.GetRestorePeersMessage;
 
 public class Server extends NodeImpl {
@@ -67,8 +70,16 @@ public class Server extends NodeImpl {
         return storage.getPeersOfBackedUpFile(message.getFileId());
     }
 
-    public synchronized List<InetSocketAddress> getReclaimPeers() {
-        return getConnectionAddresses(connections);
+    public synchronized List<InetSocketAddress> getReclaimPeers(GetReclaimPeersMessage message) {
+        Map<BackupInfo, List<InetSocketAddress>> mapa = storage.getBackedUpFiles();
+        List<InetSocketAddress> peersOfFile = storage.getPeersOfBackedUpFile(message.getFileId());
+        BackupInfo bui = Utils.findKey(mapa, new BackupInfo(message.getFileId()));
+        List<Connection> reclaimConnections = new ArrayList<>(connections);
+
+        reclaimConnections.removeIf(conn -> conn.getClientAddress().equals(bui.getIniciatorPeer())
+        || (peersOfFile != null && peersOfFile.contains(conn.getClientAddress())));
+
+        return getConnectionAddresses(reclaimConnections);
     }
 
     private List<InetSocketAddress> getConnectionAddresses(List<Connection> connections) {

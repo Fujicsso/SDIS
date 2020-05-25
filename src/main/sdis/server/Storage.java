@@ -32,8 +32,8 @@ public class Storage {
         dataDir.mkdirs();
     }
 
-    public synchronized void addBackedUpFile(FileId fileId, int desiredRepDegree, InetSocketAddress peerAddress) {
-        BackupInfo info = new BackupInfo(fileId, desiredRepDegree);
+    public synchronized void addBackedUpFile(FileId fileId, int desiredRepDegree, InetSocketAddress peerAddress, InetSocketAddress initiatorPeer) {
+        BackupInfo info = new BackupInfo(fileId, desiredRepDegree, initiatorPeer);
         List<InetSocketAddress> peers = backedUpFiles.computeIfAbsent(info,
                 i -> Collections.synchronizedList(new ArrayList<>()));
 
@@ -101,4 +101,9 @@ public class Storage {
     public synchronized int getDesiredRepDegree(FileId fileId){
         return Utils.findKey(backedUpFiles, new BackupInfo(fileId)).getDesiredRepDegree();
     }
+
+	public Map<BackupInfo, List<InetSocketAddress>> getBackedUpFiles() {
+        loadBackedUpFiles();
+		return this.backedUpFiles;
+	}
 }

@@ -28,8 +28,9 @@ public class Storage {
 
     private String storageDir;
     private long maxDiskSize;
-    // Files saved by the peer whose backup was requested by other peers
-    private List<FileId> savedFiles;
+    // Files saved by the peer whose backup was requested by other peers and their
+    // desired replication degree
+    private Map<FileId, Integer> savedFiles;
     // Files whose backup was initiated by the peer and their desired replication
     // degree
     private Map<FileId, Integer> backedUpFiles;
@@ -37,7 +38,7 @@ public class Storage {
     public Storage(InetSocketAddress peerAddress) {
         maxDiskSize = DEFAULT_DISK_SIZE;
         storageDir = Utils.generatePeerDirectory(peerAddress) + File.separatorChar;
-        savedFiles = Collections.synchronizedList(new ArrayList<>());
+        savedFiles = new ConcurrentHashMap<>();
         backedUpFiles = new ConcurrentHashMap<>();
 
         File backupDir = new File(storageDir + BACKUP_DIRECTORY);
@@ -59,11 +60,11 @@ public class Storage {
         return maxDiskSize;
     }
 
-    public List<FileId> getSavedFiles() {
+    public Map<FileId, Integer> getSavedFiles() {
         return savedFiles;
     }
 
-    public synchronized void saveFile(FileId fileId, byte[] fileData) {
+    public synchronized void saveFile(FileId fileId, byte[] fileData, int repDegree) {
         File file = Utils.createFileAndDir(storageDir + BACKUP_DIRECTORY, fileId.toString());
 
         FileOutputStream fos = null;
@@ -71,7 +72,7 @@ public class Storage {
             fos = new FileOutputStream(file);
             fos.write(fileData);
 
-            savedFiles.add(fileId);
+            savedFiles.put(fileId, repDegree);
             saveSavedFiles();
         } catch (IOException e) {
             e.printStackTrace();
@@ -84,9 +85,9 @@ public class Storage {
         Object deserialized = Utils.deserializeObject(file);
 
         if (deserialized != null)
-            savedFiles = (List<FileId>) deserialized;
+            savedFiles = (ConcurrentHashMap<FileId, Integer>) deserialized;
 
-        System.out.println(Arrays.toString(savedFiles.toArray()));
+        System.out.println(Arrays.toString(Arrays.asList(savedFiles).toArray()));
     }
 
     private void saveSavedFiles() {
@@ -163,7 +164,7 @@ public class Storage {
 
     public void deleteFile(FileId fileId) {
         File file = new File(storageDir + BACKUP_DIRECTORY + fileId.toString());
-        
+
         file.delete();
 
         removeSavedChunksOfFile(fileId);
@@ -176,17 +177,17 @@ public class Storage {
         saveSavedFiles();
     }
 
-	public long getUsedSpace() {
+    public long getUsedSpace() {
         long ret = 0;
-        for(FileId id : savedFiles){
+        for (FileId id : savedFiles.keySet()) {
             File file = new File(storageDir + BACKUP_DIRECTORY + id.toString());
 
             ret += file.length();
         }
 
         return ret;
-    } 
-    
+    }
+
     public synchronized List<File> listSortedSavedFiles() {
         File backUpDirectory = new File(storageDir + BACKUP_DIRECTORY);
         List<File> files = Arrays.asList(backUpDirectory.listFiles());
@@ -195,6 +196,5 @@ public class Storage {
 
         return files;
     }
-
 
 }

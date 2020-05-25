@@ -1,6 +1,7 @@
 package main.sdis.common;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.util.Objects;
 
 import main.sdis.file.FileId;
@@ -10,6 +11,13 @@ public class BackupInfo implements Serializable {
     private static final long serialVersionUID = -4607046531902407976L;
     private FileId fileId;
     private int desiredRepDegree;
+    private InetSocketAddress initiatorPeer;
+
+    public BackupInfo(FileId fileId, int desiredRepDegree, InetSocketAddress initiatorPeer) {
+        this.fileId = fileId;
+        this.desiredRepDegree = desiredRepDegree;
+        this.initiatorPeer = initiatorPeer;
+    }
 
     public BackupInfo(FileId fileId, int desiredRepDegree) {
         this.fileId = fileId;
@@ -26,6 +34,10 @@ public class BackupInfo implements Serializable {
 
     public int getDesiredRepDegree() {
         return desiredRepDegree;
+    }
+
+    public InetSocketAddress getIniciatorPeer() {
+        return initiatorPeer;
     }
 
     @Override

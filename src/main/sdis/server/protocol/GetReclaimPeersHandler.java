@@ -17,7 +17,7 @@ public class GetReclaimPeersHandler extends Handler<Server, GetReclaimPeersMessa
 
     @Override
     public void run() {
-        List<InetSocketAddress> reclaimPeers = node.getReclaimPeers();
+        List<InetSocketAddress> reclaimPeers = node.getReclaimPeers(message);
         
         ReclaimPeersMessage response = new ReclaimPeersMessage(node.getAddress(), reclaimPeers);
         messageSender.reply(out, response);

@@ -15,7 +15,7 @@ public class PutFileHandler extends Handler<PeerImpl, PutFileMessage> implements
 
     @Override
     public void run() {
-        node.getStorage().saveFile(message.getFileId(), message.getFileData());
+        node.getStorage().saveFile(message.getFileId(), message.getFileData(), message.getReplicationDegree());
 
         StoredMessage responseMessage = new StoredMessage(node.getAddress());
 
