@@ -75,9 +75,10 @@ public class Server extends NodeImpl {
         List<InetSocketAddress> peersOfFile = storage.getPeersOfBackedUpFile(message.getFileId());
         BackupInfo bui = Utils.findKey(mapa, new BackupInfo(message.getFileId()));
         List<Connection> reclaimConnections = new ArrayList<>(connections);
-
+        Utils.safePrintln("Estes peers não podem fazer parte do connections - " + peersOfFile + " " + bui.getIniciatorPeer() + " " + message.getSenderAddress());
         reclaimConnections.removeIf(conn -> conn.getClientAddress().equals(bui.getIniciatorPeer())
-        || (peersOfFile != null && peersOfFile.contains(conn.getClientAddress())));
+        || (peersOfFile != null && peersOfFile.contains(conn.getClientAddress())) 
+        || conn.getClientAddress().equals(message.getSenderAddress()));
 
         return getConnectionAddresses(reclaimConnections);
     }
