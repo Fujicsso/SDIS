@@ -37,7 +37,7 @@ public class Storage {
 
     public Storage(InetSocketAddress peerAddress) {
         maxDiskSize = DEFAULT_DISK_SIZE;
-        storageDir = Utils.generatePeerDirectory(peerAddress) + File.separatorChar;
+        storageDir = "peer_" + Utils.generatePeerDirectory(peerAddress) + File.separatorChar;
         savedFiles = new ConcurrentHashMap<>();
         backedUpFiles = new ConcurrentHashMap<>();
 
