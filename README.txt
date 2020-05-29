@@ -21,6 +21,10 @@ To start a peer, run the peer.sh script inside the project's root directory. Usa
 
 Start the Test App
 To start the Test App, run the test.sh script inside the project's root directory. Usage is as follows:
-./test.sh <peer_ap> BACKUP|RESTORE|DELETE|RECLAIM|STATE [<opnd_1>] [<opnd_2]
+./test.sh <peer_ap> BACKUP|RESTORE|DELETE|RECLAIM|STATE [<opnd_1>] [<opnd_2>]
 For example, to start the BACKUP protocol for a test.txt file on peer 3 with a replication degree of 2 run:
 ./test.sh 3 BACKUP test.txt 2
+
+Delete peer and server files
+To cleanup files left by the server/peers, run the cleanup.sh script inside the project's root directory. Usage is as follows:
+./cleanup.sh
