@@ -8,6 +8,7 @@ import main.sdis.common.Utils;
 import main.sdis.message.Message;
 import main.sdis.message.MessageType;
 import main.sdis.message.PutFileMessage;
+import main.sdis.message.ConfirmStoredMessage;
 import main.sdis.message.ErrorMessage;
 import main.sdis.peer.PeerImpl;
 
@@ -32,9 +33,13 @@ public class Reclaim implements Runnable {
 
         if (response == null)
             Utils.safePrintf("An unexpected error occured");
-        else if (response.getMessageType() == MessageType.STORED)
+        else if (response.getMessageType() == MessageType.STORED) {
             Utils.safePrintf("Reclaimed %dKB", message.getFileData().length / 1000);
-        else if (response.getMessageType() == MessageType.ERROR)
+
+            ConfirmStoredMessage confirmStored = new ConfirmStoredMessage(peer.getAddress(), message.getFileId(),
+                    destPeer, message.getReplicationDegree());
+            messageSender.sendMessage(confirmStored, peer.getServerAddress().getAddress(), peer.getServerAddress().getPort());
+        } else if (response.getMessageType() == MessageType.ERROR)
             Utils.safePrintf(((ErrorMessage) response).getErrorDetails());
 
     }
